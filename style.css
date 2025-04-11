@@ -8,12 +8,14 @@ body {
   
   /* 標題設置 */
   h1 {
+    font-size: 50px;
     color: #4CAF50;
     text-align: center;
   }
   
   /* 圖片的樣式 */
   img {
+    font-size: 40px;
     display: block;
     margin: 0 auto;
     border-radius: 10px;
