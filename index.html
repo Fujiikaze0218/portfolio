@@ -1,1 +1,1757 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黃士庭｜個人作品集</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* ================= 變數設定區 ================= */
+        :root {
+            /* :root 偽類別，用來全域宣告 CSS 變數，方便日後統一修改整站配色或屬性 */
+            --accent: #c5a059;
+            /* 定義主色調變數 (優雅的金色) */
+            --bg-gradient: linear-gradient(135deg, #ffffff 0%, #fcf0dc 100%);
+            /* 定義全站背景漸層變數，從左上白過渡到右下淺米色 */
+            --text-dark: #2d2d2d;
+            /* 定義深色文字變數，用於主要標題或內文，提升對比與易讀性 */
+            --text-light: #666666;
+            /* 定義淺色文字變數，用於次要文字、說明或日期 */
+            --white: #ffffff;
+            /* 定義純白色變數，維持命名一致性與易用性 */
+            --transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            /* 定義全站通用的轉場動畫：歷時 0.5 秒，並使用貝茲曲線設定「快進緩出」的平滑視覺效果 */
+        }
+
+        /* ================= 全站基礎設定 ================= */
+        html {
+            /* 針對整個 HTML 網頁文件設定 */
+            scroll-behavior: smooth;
+            /* 啟用平滑滾動效果，當點擊導覽列錨點連結時，畫面會平滑滑動而非瞬間跳轉 */
+        }
+
+        * {
+            /* 全域選擇器 (米字號)，將套用於網頁中所有的 HTML 元素 */
+            box-sizing: border-box;
+            /* 將 padding 和 border 納入元素的總寬高計算內，避免推擠導致排版跑位 */
+        }
+
+        body {
+            /* 針對網頁主體內容設定 */
+            margin: 0;
+            /* 移除瀏覽器預設的外部邊距 (預設通常有 8px) */
+            background: var(--bg-gradient);
+            /* 套用自訂的漸層背景變數 */
+            font-family: 'Noto Sans TC', sans-serif;
+            /* 設定思源黑體為主要字體，若使用者的電腦無此字體則降級使用一般無襯線字體 */
+            color: var(--text-dark);
+            /* 設定預設文字顏色為深色 */
+            line-height: 1.8;
+            /* 設定行高為字體的 1.8 倍，讓長篇文章閱讀起來更舒適、不擁擠 */
+            overflow-x: hidden;
+            /* 隱藏水平方向的溢出內容，防止網頁出現左右滾動條或因動畫造成的畫面晃動 */
+        }
+
+        /* ================= Navbar 導覽列 ================= */
+        .navbar {
+            /* 導覽列容器的類別 */
+            position: fixed;
+            /* 將導覽列固定在視窗畫面上，當使用者往下滑動時導覽列不會消失 */
+            top: 0;
+            /* 固定在視窗畫面的最頂端 */
+            width: 100%;
+            /* 寬度拉滿整個視窗的 100% */
+            padding: 25px 0;
+            /* 上下內邊距 25px，左右為 0 */
+            background: rgba(255, 255, 255, 0.7);
+            /* 設定帶有 70% 不透明度的白色背景 */
+            backdrop-filter: blur(20px);
+            /* 對背景下方內容套用 20px 的模糊濾鏡，製造毛玻璃(毛玻璃)質感 */
+            -webkit-backdrop-filter: blur(20px);
+            /* 針對 Safari 等 WebKit 核心瀏覽器的毛玻璃效果相容性設定 */
+            display: flex;
+            /* 使用 Flexbox 彈性排版，讓內部連結橫向排列 */
+            justify-content: center;
+            /* 將導覽列內的連結項目水平置中對齊 */
+            gap: 60px;
+            /* 設定每個導覽連結之間的間距為 60px */
+            z-index: 1000;
+            /* 設定 z 軸層級為 1000，確保導覽列顯示在最上層，不被其他內容覆蓋 */
+            border-bottom: 1px solid rgba(197, 160, 89, 0.15);
+            /* 在導覽列底部加上微透明的主色調邊線，增添細節 */
+            transition: var(--transition);
+            /* 套用全域自訂的平滑轉場效果 */
+        }
+
+        .navbar a {
+            /* 導覽列內的超連結 (關於我、作品集等) 設定 */
+            text-decoration: none;
+            /* 移除超連結預設的底線 */
+            color: var(--text-dark);
+            /* 文字套用深色變數 */
+            font-weight: 700;
+            /* 設定字體粗細為粗體 */
+            font-size: 1.05rem;
+            /* 字體大小設定為根元素字體的 1.05 倍 */
+            letter-spacing: 3px;
+            /* 增加字元間距 3px，增添設計呼吸感 */
+            transition: var(--transition);
+            /* 套用平滑轉場效果 (例如 hover 時改變顏色會變順) */
+            position: relative;
+            /* 設定為相對定位，做為下方 hover 懸停底線 (絕對定位) 的參考基準 */
+        }
+
+        .navbar a::after {
+            /* 導覽連結的 ::after 偽元素，我們用這個來製作懸停展開的底線動畫 */
+            content: '';
+            /* 偽元素必須有的屬性，內容設為空字串 */
+            position: absolute;
+            /* 絕對定位，它的位置會相對於父元素 (.navbar a) */
+            width: 0;
+            /* 初始寬度為 0 (平時隱藏狀態) */
+            height: 2px;
+            /* 底線的高度(粗細)為 2px */
+            bottom: -8px;
+            /* 距離文字底部往下推 8px */
+            left: 50%;
+            /* 從水平方向的中心點 (50%) 開始定位 */
+            background: var(--accent);
+            /* 底線顏色使用主色調 (金色變數) */
+            transition: var(--transition);
+            /* 寬度變化時套用平滑轉場 */
+            transform: translateX(-50%);
+            /* 配合 left: 50%，將底線向左偏移自身寬度的一半，達成真正的「從中心向左右展開」效果 */
+        }
+
+        .navbar a:hover {
+            /* 當滑鼠懸停在導覽連結上的狀態 */
+            color: var(--accent);
+            /* 文字顏色漸變為主色調 */
+        }
+
+        .navbar a:hover::after {
+            /* 當滑鼠懸停在導覽連結時，控制其偽元素 (底線) 的狀態 */
+            width: 100%;
+            /* 將底線寬度從 0% 展開至 100% */
+        }
+
+        /* ================= Hero 首頁主視覺 ================= */
+        .hero {
+            /* 首頁主視覺區塊的容器 */
+            height: 100vh;
+            /* 高度設定為視窗高度的 100% (全螢幕) */
+            display: flex;
+            /* 使用 Flexbox 排版 */
+            flex-direction: column;
+            /* 將子元素垂直排列 (由上到下，大標、副標、按鈕) */
+            justify-content: center;
+            /* 垂直方向置中 */
+            align-items: center;
+            /* 水平方向置中 */
+            text-align: center;
+            /* 讓內部多行文字置中對齊 */
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8) 0%, rgba(244, 238, 224, 0.4) 100%);
+            /* 設計一個從中心向外放射的漸層背景，營造聚光燈感 */
+        }
+
+        .hero h1 {
+            /* 主視覺區塊的大標題 (姓名) */
+            font-size: 4.5rem;
+            /* 設定極大的字體 4.5rem，極具視覺張力 */
+            font-weight: 700;
+            /* 設定字體為粗體 */
+            margin: 0;
+            /* 移除瀏覽器對 h1 預設的外邊距 */
+            letter-spacing: 0.3em;
+            /* 增加極寬的字距 0.3em */
+            text-indent: 0.3em;
+            /* 首行縮排 0.3em。用來抵銷最後一個字的 letter-spacing 所造成的排版不對稱，讓整體完美置中 */
+            background: linear-gradient(135deg, #2d2d2d 0%, #c5a059 100%);
+            /* 文字底色套用從深灰到金色的斜向漸層 */
+            -webkit-background-clip: text;
+            /* 將背景裁剪至只保留文字的形狀範圍內 (Safari/Chrome 前綴) */
+            -webkit-text-fill-color: transparent;
+            /* 將文字本身原本的填色設為透明，讓底下的漸層背景能夠透出來 */
+        }
+
+        .hero p.subtitle {
+            /* 主視覺區塊的副標題 (身分/職業) */
+            font-size: 1.2rem;
+            /* 字體大小 1.2rem */
+            color: var(--text-light);
+            /* 使用淺色文字變數 */
+            letter-spacing: 12px;
+            /* 拉出高達 12px 的字距，營造高級設計感 */
+            text-indent: 12px;
+            /* 抵銷字距造成的右偏，確保置中對齊 */
+            margin: 25px 0 20px;
+            /* 上方外邊距 25px，左右 0，下方 20px */
+            font-weight: 300;
+            /* 字體設定為輕柔的細體 */
+        }
+
+        .hero-desc {
+            /* 主視覺區塊的雙行說明文字 */
+            font-size: 1.1rem;
+            /* 字體大小 1.1rem */
+            color: var(--text-light);
+            /* 使用淺色文字變數 */
+            letter-spacing: 5px;
+            /* 設定字距 5px */
+            line-height: 2;
+            /* 行高設為 2 倍，讓上下兩行字有呼吸空間 */
+            margin: 0 0 45px;
+            /* 上、左右邊距為 0，下方留出 45px 空間與按鈕區隔 */
+            font-weight: 300;
+            /* 字體設定為細體 */
+        }
+
+        .hero-action {
+            /* 按鈕群組的外部容器 */
+            display: flex;
+            /* 使用 Flexbox 排版 */
+            gap: 20px;
+            /* 兩個按鈕之間的水平間距為 20px */
+            justify-content: center;
+            /* 按鈕群組水平置中排列 */
+        }
+
+        .btn-cta,
+        /* 針對兩種樣式的按鈕 (實心、外框) 進行共同外觀設定 */
+        .btn-outline {
+            padding: 14px 35px;
+            /* 內邊距：上下 14px、左右更長達 35px，讓按鈕看起來更修長 */
+            text-decoration: none;
+            /* 移除超連結底線 */
+            border-radius: 50px;
+            /* 設定極大圓角，讓按鈕兩端變為完全半圓 (藥丸形狀) */
+            transition: var(--transition);
+            /* 套用平滑轉場效果 (針對 hover 的變化) */
+            letter-spacing: 3px;
+            /* 按鈕內的文字字距 3px */
+            font-weight: 500;
+            /* 字體設定為中等粗細 */
+            font-size: 0.9rem;
+            /* 字體大小稍微縮小為 0.9rem，顯得更精緻 */
+            text-transform: uppercase;
+            /* 強制將按鈕內的所有英文字母顯示為大寫 */
+        }
+
+        .btn-cta {
+            /* 主要行動呼籲按鈕 (VIEW PROJECTS) 的專屬設定 */
+            border: 1.5px solid var(--accent);
+            /* 主色調的 1.5px 實線邊框 */
+            color: var(--accent);
+            /* 文字顏色也為主色調 */
+        }
+
+        .btn-cta:hover {
+            /* 當滑鼠移入主要按鈕時 */
+            background: var(--accent);
+            /* 背景填滿主色調 */
+            color: var(--white);
+            /* 文字反白 */
+            box-shadow: 0 15px 25px rgba(197, 160, 89, 0.3);
+            /* 增加底部擴散的主色調陰影，產生按鈕浮現的立體感 */
+            transform: translateY(-3px);
+            /* 透過 Y 軸往上平移 3px，配合陰影增強物理按下/彈起的互動回饋感 */
+        }
+
+        .btn-outline {
+            /* 次要按鈕 (VIEW EXPERIENCE) 的專屬設定 */
+            border: 1.5px solid var(--text-light);
+            /* 淺色 1.5px 實線邊框 */
+            color: var(--text-light);
+            /* 文字顏色為淺色 */
+        }
+
+        .btn-outline:hover {
+            /* 當滑鼠移入次要按鈕時 */
+            background: var(--text-light);
+            /* 背景填滿淺灰色 */
+            color: var(--white);
+            /* 文字反白 */
+            transform: translateY(-3px);
+            /* 同樣將按鈕往上平移 3px */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            /* 增加一層輕微柔和的黑色陰影 */
+        }
+
+        .btn-cta i,
+        /* 針對兩個按鈕內部包含的 FontAwesome 圖示 (如調色盤、獎盃) 進行微調 */
+        .btn-outline i {
+            font-size: 1.2rem;
+            /* 將圖示稍微放大至 1.2rem */
+            margin-right: 10px;
+            /* 圖示右側留出 10px 的間距，避免緊貼文字 */
+            vertical-align: middle;
+            /* 利用對齊屬性確保圖示與旁邊的文字在視覺上能垂直居中對齊 */
+        }
+
+        /* ================= 滾動浮現動畫 ================= */
+        .reveal {
+            /* 準備做為「滑動進場動畫」的基礎類別 (套用在各 section) */
+            opacity: 0;
+            /* 初始狀態設定為完全透明 (隱藏) */
+            transform: translateY(40px);
+            /* 初始狀態透過 Y 軸往下偏移 40px */
+            transition: all 1s cubic-bezier(0.5, 0, 0, 1);
+            /* 動畫歷時 1 秒，使用自訂曲線讓進場變得有重量感又滑順 */
+        }
+
+        .reveal.active {
+            /* 配合下方的 JavaScript，當捲動到該區塊時會動態加入此 active 類別 */
+            opacity: 1;
+            /* 漸變為完全不透明 (顯示) */
+            transform: translateY(0);
+            /* 回到原始(0偏移)的位置，產生從下方緩慢滑入的效果 */
+        }
+
+        /* ================= Section 通用設定 ================= */
+        .section {
+            /* 每個主要區塊 (About, Skills, Portfolio...) 的通用外容器設定 */
+            padding: 120px 20px;
+            /* 區塊上下保留極大的 120px 空間確保呼吸感，左右各 20px 內距防止在手機上緊貼螢幕邊緣 */
+            max-width: 1200px;
+            /* 限制區塊內文的最大寬度為 1200px，維持大螢幕的版面集中度 */
+            margin: auto;
+            /* 配合 max-width，讓區塊在整個網頁中保持水平置中 */
+        }
+
+        .section-title {
+            /* 各區塊大標題 (如 ABOUT ME) 的通用設定 */
+            text-align: center;
+            /* 標題文字水平置中 */
+            font-size: 2rem;
+            /* 字體大小為 2rem */
+            letter-spacing: 10px;
+            /* 字距拉開 10px */
+            text-indent: 10px;
+            /* 首行縮排 10px 來抵銷最後一個字的字距，維持視覺上完美對稱置中 */
+            margin-bottom: 70px;
+            /* 標題底部留出 70px 空白，與下方的內容拉開距離 */
+            position: relative;
+            /* 設定為相對定位，做為下方裝飾用偽元素絕對定位的參考座標 */
+            font-weight: 700;
+            /* 設定為粗體 */
+            color: var(--text-dark);
+            /* 文字使用深色變數 */
+        }
+
+        .section-title::after {
+            /* 區塊大標題下方的裝飾用金色短橫線 */
+            content: "";
+            /* 偽元素必須有的屬性，給予空字串 */
+            width: 40px;
+            /* 橫線的寬度設定為 40px */
+            height: 2px;
+            /* 橫線的高度 (粗細) 為 2px */
+            background: var(--accent);
+            /* 橫線背景顏色使用主色調 */
+            position: absolute;
+            /* 絕對定位，獨立於一般的文字排列之外 */
+            bottom: -20px;
+            /* 定位於標題文字框外下方的 20px 處 */
+            left: 50%;
+            /* 從水平方向的中心點出發 */
+            transform: translateX(-50%);
+            /* 透過位移向左退自身寬度(40px)的一半，達成真正的畫面置中 */
+        }
+
+        /* ================= Skills 技能區塊 (雙欄分類) ================= */
+        .skills-wrapper {
+            /* 兩個技能分類卡片的外包裝容器 */
+            display: flex;
+            /* 使用 Flexbox 排版 */
+            flex-wrap: wrap;
+            /* 當空間不夠並排時，允許卡片折行排列 */
+            gap: 40px;
+            /* 卡片與卡片之間的溝距設定為 40px */
+            justify-content: center;
+            /* 整個卡片群組在主軸方向(水平)上置中對齊 */
+            max-width: 900px;
+            /* 限制技能區塊群組的最大寬度為 900px，使排版更緊湊 */
+            margin: 0 auto;
+            /* 整個容器本身在頁面上水平置中 */
+        }
+
+        .skill-category {
+            /* 單一個技能分類卡片 (左邊的 Tech，或右邊的 Art) */
+            flex: 1;
+            /* 讓兩個卡片彈性伸展填滿剩餘空間 (預設 1:1 均分寬度) */
+            min-width: 300px;
+            /* 卡片最小寬度不低於 300px，避免在手機/平板上被縮得太窄 */
+            text-align: center;
+            /* 卡片內的所有內容預設水平置中 */
+            background: rgba(255, 255, 255, 0.4);
+            /* 設定帶有 40% 透明度的白色背景，帶出一點底色 */
+            padding: 30px;
+            /* 內部四周邊距 30px */
+            border-radius: 20px;
+            /* 卡片外框使用 20px 圓角 */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            /* 加入微弱、大範圍的黑色陰影增加立體感與紙張分離感 */
+        }
+
+        .skill-category h3 {
+            /* 技能卡片上方的小標題 */
+            color: var(--accent);
+            /* 字體使用主色調 */
+            letter-spacing: 3px;
+            /* 字距 3px */
+            margin-top: 0;
+            /* 移除瀏覽器預設的上方外邊距，對齊卡片內緣 */
+            margin-bottom: 25px;
+            /* 下方留出 25px，與內部的技能標籤拉開距離 */
+            font-size: 1.2rem;
+            /* 字體大小 1.2rem */
+        }
+
+        .skill-category h3 i {
+            /* 技能卡片標題旁的圖示 */
+            margin-right: 8px;
+            /* 圖示右側留 8px 空隙與文字分開 */
+        }
+
+        .skill-tags {
+            /* 包覆各別單一技能標籤 (如 C++, Python) 的水平容器 */
+            display: flex;
+            /* 使用 Flexbox */
+            justify-content: center;
+            /* 標籤群在水平方向盡量置中 */
+            flex-wrap: wrap;
+            /* 允許標籤排不下時自然換行往下排 */
+            gap: 12px;
+            /* 標籤彼此之間的垂直與水平間隔皆為 12px */
+        }
+
+        .skill-tags span {
+            /* 單一個膠囊狀的技能標籤外觀 */
+            padding: 8px 20px;
+            /* 上下內邊距 8px，左右 20px */
+            background: rgba(255, 255, 255, 0.9);
+            /* 背景設定為 90% 不透明的極淺白色 */
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            /* 設定極淡的灰色外側邊框 */
+            border-radius: 50px;
+            /* 圓角極大值，創造出藥丸/膠囊形狀 */
+            font-size: 0.9rem;
+            /* 字體大小稍微縮小為 0.9rem */
+            letter-spacing: 1px;
+            /* 字距 1px */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            /* 添加細微的底部陰影，創造立體浮凸感 */
+            transition: var(--transition);
+            /* 套用平滑的 Hover 轉場效果 */
+            cursor: default;
+            /* 雖然有 hover 特效，但滑鼠游標保持預設指標，暗示它不是超連結 */
+        }
+
+        .skill-tags span:hover {
+            /* 滑鼠懸停於單個技能標籤時的動態特效 */
+            border-color: var(--accent);
+            /* 邊框顏色改變為主色調 */
+            transform: translateY(-3px) scale(1.05);
+            /* 標籤本體往上浮動 3px 且稍微放大 1.05 倍，創造很活潑的跳躍感 */
+            color: var(--accent);
+            /* 文字顏色變成主色調 */
+            box-shadow: 0 10px 25px rgba(197, 160, 89, 0.15);
+            /* 加深並擴大帶有主色調光暈的陰影 */
+        }
+
+        /* ================= Projects 濾鏡與瀑布流 ================= */
+        .filter-btns {
+            /* 作品集區塊上方的分類篩選按鈕群組容器 */
+            display: flex;
+            /* 使用 Flexbox 排版 */
+            justify-content: center;
+            /* 按鈕群置中排列 */
+            gap: 15px;
+            /* 按鈕彼此間隔 15px */
+            margin-bottom: 50px;
+            /* 整個按鈕群底部留 50px 空間與下方的作品圖片拉開距離 */
+            flex-wrap: wrap;
+            /* 螢幕寬度縮小時，允許按鈕換行避免被裁切 */
+        }
+
+        .filter-btn {
+            /* 單個分類篩選按鈕的外觀設定 */
+            background: transparent;
+            /* 預設背景設為全透明 */
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            /* 設定帶有 10% 透明度的淡黑色邊框 */
+            padding: 8px 24px;
+            /* 上下內邊距 8px，左右 24px */
+            border-radius: 50px;
+            /* 藥丸形圓角 */
+            cursor: pointer;
+            /* 游標改為手指形狀，提示使用者可點擊過濾 */
+            color: var(--text-light);
+            /* 文字設定為淺灰的次要顏色 */
+            font-family: inherit;
+            /* 強制繼承父元素定義的思源黑體 (button 標籤預設有時不繼承) */
+            font-size: 0.95rem;
+            /* 字體大小 0.95rem */
+            letter-spacing: 2px;
+            /* 字距 2px */
+            transition: var(--transition);
+            /* 按鈕顏色與陰影的平滑變化 */
+        }
+
+        .filter-btn.active,
+        /* 被選中 (包含 active 類別) 的按鈕狀態 */
+        .filter-btn:hover {
+            /* 或者是滑鼠正在懸停時的狀態 */
+            background: var(--accent);
+            /* 背景填滿為主色調 (點亮效果) */
+            color: var(--white);
+            /* 文字反白增加辨識度 */
+            border-color: var(--accent);
+            /* 邊框同步變為主色調 */
+            box-shadow: 0 5px 15px rgba(197, 160, 89, 0.2);
+            /* 加上主色調的微弱光暈陰影 */
+        }
+
+        .gallery {
+            /* 作品集圖片的外部容器 (瀑布流排版核心) */
+            column-count: 3;
+            /* CSS 原生多欄佈局：將內容強制分為 3 欄垂直排列 */
+            column-gap: 15px;
+            /* 每一欄與欄之間的間距為 15px */
+            width: 100%;
+            /* 寬度拉滿其父元素的可用寬度 */
+            transition: var(--transition);
+            /* (備用) 排版重整時可能的過渡效果 */
+        }
+
+        .gallery-item {
+            /* 單一張作品圖片外部的卡片容器 */
+            display: inline-block;
+            /* 設定為行內區塊，這是防止圖片在跨欄位(多欄佈局)時被硬生生從中間切斷的關鍵！ */
+            width: 100%;
+            /* 寬度填滿它所處的該「欄位」的 100% */
+            margin-bottom: 15px;
+            /* 圖片下方與另一張圖片的間距 15px */
+            position: relative;
+            /* 相對定位 */
+            border-radius: 16px;
+            /* 圖片容器外框圓角設定為 16px */
+            overflow: hidden;
+            /* 隱藏子元素超出的部分，確保 hover 圖片放大時，不會破壞圓角外觀 */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            /* 圖片下方的黑色軟陰影，製造畫廊層次感 */
+            background: #fff;
+            /* 背景底色為白色，在圖片未載入前呈現 */
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            /* 針對卡片的位移和透明度，獨立加上 0.4 秒的平滑過渡，配合 JS 實現淡入淡出隱藏 */
+        }
+
+        /* 配合 JavaScript 濾鏡動畫使用 */
+        .gallery-item.hide {
+            /* JS 判斷該項目不符合過濾條件時，會動態加入此類別 */
+            display: none;
+            /* 讓該作品不在畫面上顯示，同時也不再佔據瀑布流的排版空間 */
+        }
+
+        .gallery-item img {
+            /* 專案卡片內實際的圖片元素設定 */
+            width: 100%;
+            /* 圖片寬度自動適應容器的 100% 寬 */
+            height: auto;
+            /* 高度依據原始圖片比例自動縮放，保證圖片不變形 */
+            display: block;
+            /* 設定為區塊級元素，去除瀏覽器處理 inline 圖片時預設底部產生的一條神秘空白縫隙 */
+            cursor: zoom-in;
+            /* 滑鼠移至圖片上時，顯示有「+」號的放大鏡游標，暗示點擊開啟燈箱 */
+            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            /* 圖片本體縮放特效的平滑曲線與歷時設定 */
+        }
+
+        .gallery-item:hover {
+            /* 滑鼠移到單一作品卡片上方時 */
+            transform: translateY(-8px);
+            /* 整張卡片連同陰影往上浮動移動 8px */
+            box-shadow: 0 20px 40px rgba(197, 160, 89, 0.2);
+            /* 陰影變得更厚重、且染上一點金色調，聚焦視覺 */
+        }
+
+        .gallery-item:hover img {
+            /* 滑鼠移到作品卡片上方時，對「圖片本體」產生的影響 */
+            transform: scale(1.08);
+            /* 圖片在容器內部稍微放大至 1.08 倍 (配合父元素的 overflow:hidden，產生圖片貼近鏡頭的錯覺而不撐破圓角外框) */
+        }
+
+        /* ================= Experience 經歷時間軸 ================= */
+        .timeline {
+            /* 經歷時間軸的整體主容器 */
+            position: relative;
+            /* 設為相對定位，供內部圓點進行絕對定位時的參考基準 */
+            max-width: 800px;
+            /* 整個時間軸文字區塊的最大寬度限制在 800px */
+            margin: 0 auto;
+            /* 水平置中於畫面 */
+            padding-left: 30px;
+            /* 左側留出 30px 空間供內部文字不會壓在線上 */
+            border-left: 2px solid rgba(197, 160, 89, 0.3);
+            /* 在整個容器的左邊界畫出一條半透明的金色主色調直線，貫穿所有事件 */
+            /* 柔和的金色線條 */
+        }
+
+        .timeline-item {
+            /* 每一項經歷事件的外容器 */
+            position: relative;
+            /* 相對定位，供內部專屬該項目的小圓圈進行定位 */
+            margin-bottom: 50px;
+            /* 每個事件區塊底部預留 50px 的空隙與下一個事件分開 */
+            padding-left: 25px;
+            /* 內容在此容器內再往右推 25px，跟左側的主線徹底分開 */
+        }
+
+        .timeline-item:last-child {
+            /* 時間軸的最後一個事件區塊的特殊處理 */
+            margin-bottom: 0;
+            /* 移除最後一項預留的底部邊距，讓區塊收尾更緊湊乾淨 */
+        }
+
+        .timeline-dot {
+            /* 標示在時間軸直線上的裝飾性小圓點 */
+            position: absolute;
+            /* 絕對定位於每個 `.timeline-item` 內 */
+            left: -37px;
+            /* 往左拉回 37px，這是數學計算後剛好能將圓點的圓心對齊在左側直線上 (補齊 padding 的偏移) */
+            /* 對齊左側線條 */
+            top: 5px;
+            /* 距離頂部往下偏移 5px，讓圓心對齊右側的第一行文字 (日期) */
+            width: 14px;
+            /* 圓點寬度 14px */
+            height: 14px;
+            /* 圓點高度 14px */
+            background: var(--white);
+            /* 圓點內部填白色，看起來像空心圓 */
+            border: 3px solid var(--accent);
+            /* 圓點邊框粗細 3px，顏色為主色調 */
+            border-radius: 50%;
+            /* 50% 圓角，將原本正方形的 DIV 變成完美的圓形 */
+            box-shadow: 0 0 10px rgba(197, 160, 89, 0.4);
+            /* 在小圓點外部加上一點發光的金色陰影效果 */
+            transition: var(--transition);
+            /* 圓點大小變化的平滑轉場 */
+        }
+
+        .timeline-item:hover .timeline-dot {
+            /* 當滑鼠移到該經歷「整列」項目上時，觸發小圓點的動態變化 */
+            background: var(--accent);
+            /* 圓點內部被主色調填滿，變成實心點亮狀態 */
+            transform: scale(1.3);
+            /* 圓點原地放大為原來的 1.3 倍 */
+        }
+
+        .timeline-date {
+            /* 顯示年份日期的文字設定 */
+            font-size: 0.9rem;
+            /* 字體大小 0.9rem */
+            color: var(--accent);
+            /* 字體顏色突顯為主色調 */
+            font-weight: 700;
+            /* 加粗 */
+            letter-spacing: 2px;
+            /* 字距拉寬 2px */
+            margin-bottom: 8px;
+            /* 底部與下方的經歷標題保留 8px 空隙 */
+        }
+
+        .timeline-content {
+            /* 裝載經歷文字內容的卡片背景容器 */
+            background: rgba(255, 255, 255, 0.6);
+            /* 60% 不透明度的白色背景，與背景漸層稍微融合 */
+            padding: 25px;
+            /* 卡片四周內邊距 25px */
+            border-radius: 16px;
+            /* 卡片圓角 16px */
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.03);
+            /* 淡色的微弱底部陰影 */
+            transition: var(--transition);
+            /* 互動 hover 的平滑過渡 */
+            border: 1px solid rgba(0, 0, 0, 0.02);
+            /* 極淡極細的邊框線，強化卡片邊緣輪廓 */
+        }
+
+        .timeline-item:hover .timeline-content {
+            /* 滑鼠移上該經歷項目時，內容卡片的動態變化 */
+            box-shadow: 0 10px 30px rgba(197, 160, 89, 0.1);
+            /* 陰影面積擴大，且染上微量金色，營造卡片被提起的光源感 */
+            transform: translateX(5px);
+            /* 整張內容卡片稍微向右方平移 5px，產生互動推進感 */
+        }
+
+        .timeline-content h3 {
+            /* 經歷的粗體標題 (如職稱或比賽名稱) */
+            margin: 0 0 10px;
+            /* 頂端與左右外距 0，底部邊距 10px */
+            font-size: 1.3rem;
+            /* 字體大小 1.3rem */
+            color: var(--text-dark);
+            /* 文字設為深色 */
+            letter-spacing: 1px;
+            /* 字距 1px */
+        }
+
+        .timeline-content p {
+            /* 經歷的詳細說明段落文字 */
+            margin: 0;
+            /* 移除預設外邊距 */
+            color: var(--text-light);
+            /* 淺色說明文字 */
+            font-size: 0.95rem;
+            /* 字體大小稍微縮小到 0.95rem 區分主從層級 */
+        }
+
+        /* ================= Lightbox 燈箱效果 ================= */
+        .lightbox {
+            /* 點擊作品圖片後，彈出覆蓋全網頁的滿版黑色燈箱背景容器 */
+            position: fixed;
+            /* 固定定位，不隨頁面滾動，覆蓋於瀏覽器視窗 */
+            top: 0;
+            left: 0;
+            /* 靠齊視窗左上角 */
+            width: 100%;
+            height: 100%;
+            /* 寬高全部拉滿 100% */
+            background: rgba(0, 0, 0, 0.92);
+            /* 使用 92% 極高不透明度的純黑背景，遮蔽後方網頁 */
+            display: flex;
+            /* Flex彈性排版 */
+            justify-content: center;
+            /* 讓內部的放大的圖片水平置中 */
+            align-items: center;
+            /* 讓內部圖片垂直置中 */
+            z-index: 2000;
+            /* 給予極高(頂天)的層級設定，確保能蓋過導覽列(z-index:1000)等任何元素 */
+            opacity: 0;
+            /* 初始狀態為完全透明 (看不見) */
+            pointer-events: none;
+            /* 讓滑鼠點擊事件穿透這層看不見的燈箱，才不會在平時干擾點擊下方連結 */
+            transition: opacity 0.4s ease;
+            /* 漸顯漸隱的 0.4 秒流暢過渡動畫 */
+        }
+
+        .lightbox.active {
+            /* 當使用者點擊圖片，由 JavaScript 加上此類別，燈箱就會被啟動 */
+            opacity: 1;
+            /* 從透明漸變為完全可見的黑底 */
+            pointer-events: all;
+            /* 恢復攔截滑鼠點擊互動事件，允許使用者點擊黑底關閉 */
+        }
+
+        .lightbox img {
+            /* 燈箱正中間準備被放大顯示的那張圖片 */
+            max-width: 90%;
+            /* 為了不貼近螢幕邊緣，最大寬度不超過視窗寬度的 90% */
+            max-height: 85vh;
+            /* 高度不超過視窗高度的 85%，預留上下空間 */
+            object-fit: contain;
+            /* 確保圖片保持自身原始比例，完整顯示在上述範圍內，不會被擠壓變形 */
+            border-radius: 8px;
+            /* 圖片四角加上 8px 的微小圓角修飾 */
+            transform: scale(0.9);
+            /* 初始狀態稍微縮小為原本的 0.9 倍 (作為等等放大出現動畫的起點) */
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            /* 圖片被點開彈出時放大的過渡動畫與曲線 */
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            /* 在放大的圖片周圍加上深色大陰影，與黑底分離出明顯的空間感 */
+        }
+
+        .lightbox.active img {
+            /* 燈箱被啟動後，內部放大的圖片最終狀態 */
+            transform: scale(1);
+            /* 將圖片從 0.9 倍放大回 1 倍正常視角大小，配合黑底完成一個漂亮的「向外彈出」視覺動態 */
+        }
+
+        .lightbox-close {
+            /* 燈箱右上角的「關閉」叉叉按鈕 */
+            position: absolute;
+            /* 絕對定位，相對於滿版的燈箱 */
+            top: 30px;
+            /* 距離頂部 30px */
+            right: 40px;
+            /* 距離右側 40px */
+            color: rgba(255, 255, 255, 0.7);
+            /* 白色字體，帶有 70% 透明度 */
+            font-size: 50px;
+            /* 極大的字體 50px */
+            cursor: pointer;
+            /* 游標變為可點擊手指形狀 */
+            transition: var(--transition);
+            /* hover 時的平滑轉場 */
+            line-height: 1;
+            /* 行高設為 1，去除預設字體多餘的上下留白，讓置中定位更準確 */
+        }
+
+        .lightbox-close:hover {
+            /* 滑鼠懸停於關閉按鈕時 */
+            color: #fff;
+            /* 顏色從半透明白色變為純白點亮 */
+            transform: rotate(90deg);
+            /* 整顆叉叉順時針旋轉 90 度，增加有趣的微互動感 */
+        }
+
+        /* ================= 獲獎紀錄時間軸 (Achievement Timeline) ================= */
+        /* 雖然以下這組樣式沒有在你提供的 HTML 結構中被實作呼叫到，但仍為你翻譯註解其設計巧思 */
+        .timeline-v2 {
+            /* 第二種(升級版)樣式的時間軸主容器 */
+            max-width: 800px;
+            /* 限制最大寬度 800px */
+            margin: 0 auto;
+            /* 水平置中於畫面 */
+            position: relative;
+            /* 作為內部偽元素(如主線條)進行絕對定位的參考區塊 */
+            padding: 20px 0;
+            /* 上下內邊距增加 20px */
+        }
+
+        /* 主垂直線 */
+        .timeline-v2::before {
+            /* 畫出此版本時間軸的垂直主線 */
+            content: '';
+            /* 空字串建立偽元素 */
+            position: absolute;
+            /* 絕對定位 */
+            left: 20px;
+            /* 距離左側 20px 處畫線 (留給圓點空間) */
+            top: 0;
+            /* 從頂部邊緣開始 */
+            width: 2px;
+            /* 線條寬度為 2px 粗 */
+            height: 100%;
+            /* 高度延展長滿整個父區塊 */
+            background: linear-gradient(to bottom, transparent, var(--accent) 15%, var(--accent) 85%, transparent);
+            /* 線條上色：一條從上到下(透明->金色->金色->透明)的漸層，營造出兩端淡出的無盡感 */
+            opacity: 0.3;
+            /* 整條線加上透明度 30% 讓它顯得不突兀 */
+        }
+
+        .timeline-item-v2 {
+            /* 第二種時間軸內的個別事件項目容器 */
+            position: relative;
+            /* 相對定位，供內部圓點定位基準 */
+            padding-left: 60px;
+            /* 將內容大幅度往右推 60px 讓出給垂直線與動態圓圈的足夠空間 */
+            margin-bottom: 60px;
+            /* 底部邊距 60px 大幅隔開下一個項目區塊 */
+        }
+
+        /* 獎項圓點 - 根據性質變色 */
+        .timeline-marker {
+            /* 標記年份與項目的主軸裝飾圓點 */
+            position: absolute;
+            /* 絕對定位 */
+            left: 11px;
+            /* 微調偏移 11px 至恰好壓過對準左邊的垂直線上 */
+            top: 8px;
+            /* 垂直方向微調往下，使其能對齊右側的第一行文字中心點 */
+            width: 20px;
+            /* 圓點較為大顆，寬 20px */
+            height: 20px;
+            /* 圓點高 20px */
+            border-radius: 50%;
+            /* 完美圓形 */
+            background: var(--white);
+            /* 內填底色白 */
+            border: 3px solid var(--accent);
+            /* 邊框 3px 主色調 */
+            z-index: 2;
+            /* 提高層級，確保圓點蓋在主垂直線上方 */
+            transition: var(--transition);
+            /* hover 平滑過渡設定 */
+        }
+
+        .timeline-item-v2:hover .timeline-marker {
+            /* 滑鼠移上該事件項目時圓點的變化 */
+            transform: scale(1.5);
+            /* 圓圈放大 1.5 倍 */
+            background: var(--accent);
+            /* 圓圈中心被主色調填滿實心 */
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.5);
+            /* 周圍發出強烈的金色光暈陰影 */
+        }
+
+        /* 內容卡片 */
+        .timeline-info {
+            /* 包覆左側文字敘述與右側小圖預覽的水平排列容器 */
+            display: flex;
+            /* 彈性佈局 */
+            align-items: flex-start;
+            /* 讓內部所有元素靠頂端對齊，避免文字長短不一造成的上下亂移 */
+            gap: 30px;
+            /* 左右兩個元素之間間隔 30px */
+        }
+
+        .timeline-text {
+            /* 左半側放純文字說明的區域 */
+            flex: 1;
+            /* 使其佔據 Flex 內部剩餘的所有空間 */
+        }
+
+        .timeline-year {
+            /* 單獨一行的年份顯示文字 */
+            font-weight: 700;
+            /* 粗體字 */
+            color: var(--accent);
+            /* 主色調 */
+            font-size: 1.2rem;
+            /* 字體大小 1.2rem */
+            display: block;
+            /* 讓行內標籤轉換為區塊，獨立佔用一行不與後方文字擠在一起 */
+            margin-bottom: 5px;
+            /* 下方留 5px 空隙 */
+        }
+
+        .timeline-title {
+            /* 獲獎事件的名稱大標題 */
+            font-size: 1.4rem;
+            /* 較大字體 1.4rem */
+            margin: 0 0 10px;
+            /* 清除不必要的 margin，只保留下方邊距 10px */
+            color: var(--text-dark);
+            /* 深色文字 */
+        }
+
+        .timeline-award {
+            /* 寫著什麼名次的獎項徽章樣式 (如：銀牌獎) */
+            display: inline-block;
+            /* 允許設定寬高內距但保持同行不斷行 */
+            padding: 4px 12px;
+            /* 內邊距，上下 4px 左右 12px */
+            background: rgba(197, 160, 89, 0.1);
+            /* 極淡的金色主色調當作底色，凸顯獎項 */
+            color: var(--accent);
+            /* 文字為主色調 */
+            border-radius: 4px;
+            /* 小圓角 4px 增加精緻感 */
+            font-weight: 700;
+            /* 粗體 */
+            font-size: 0.9rem;
+            /* 稍微縮小字體到 0.9rem */
+            margin-bottom: 10px;
+            /* 底部距下方段落文字距離 10px */
+        }
+
+        /* 藝術側邊小插圖 */
+        .timeline-art-preview {
+            /* 事件右半側搭配的輔助縮圖預覽的外框 (類似夾帶一張拍立得) */
+            width: 120px;
+            /* 固定縮圖寬度 120px */
+            height: 120px;
+            /* 固定縮圖高度 120px 呈正方形 */
+            border-radius: 12px;
+            /* 邊緣修飾 12px 圓角 */
+            overflow: hidden;
+            /* 防止內部可能放入的圖片超出圓角裁切範圍 */
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            /* 加上極細淡灰邊框增加實體感 */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            /* 底部淡淡的黑陰影 */
+            transform: rotate(3deg);
+            /* 預設略微向右傾斜 3 度，帶有一種夾紙或拍立得隨興亂放的美感 */
+            transition: var(--transition);
+            /* 圖片被動態 hover 時的平滑過渡 */
+            background: #eee;
+            /* 在圖片還沒載入前，或者不放圖時顯示的灰色底塊預設值 */
+        }
+
+        .timeline-item-v2:hover .timeline-art-preview {
+            /* 當滑鼠移入這整塊事件區塊時縮圖的動態特效 */
+            transform: rotate(0deg) scale(1.1);
+            /* 傾斜的圖片轉正到 0 度，並放大貼近畫面 1.1 倍 */
+        }
+
+        /* ================= 檔案卡片式經歷 (Dossier Layout) ================= */
+        .dossier-container {
+            /* MILESTONES 區塊內的堆疊式卡片設計專用父容器 */
+            position: relative;
+            /* 相對定位，供後續可能設計絕對定位元素參考 */
+            max-width: 1000px;
+            /* 限制寬度較上一版的 800px 更寬為 1000px，能容納雙欄內容 */
+            margin: 100px auto;
+            /* 頂部與前一區塊隔 100px 空白，並強制左右置中 */
+            padding-bottom: 300px;
+            /* 刻意在底部留白 300px。因為卡片採用 sticky 疊加，這樣能確保網頁滾動時有足夠「滑行長度」展示卡片相疊到底的完整動畫體驗，才不會提早碰壁被切斷。 */
+        }
+
+        .dossier-card {
+            /* 用來展示獲獎紀錄的超大橫向卡片 */
+            position: sticky;
+            /* 採用強大的「黏性定位」，這是這段設計最大的亮點，結合捲軸能產生「疊加覆蓋」的神奇效果 */
+            top: 150px;
+            /* 當使用者頁面向下捲動，導致此卡片的頂部碰到視窗的 150px 處時，它就會固定死在畫面上不再往上飄走 */
+            width: 100%;
+            /* 寬度填滿整個 1000px 的容器寬度 */
+            min-height: 450px;
+            /* 確保不管字數多寡，這張卡片最少有 350px 的固定高度 */
+            margin-bottom: 150px;
+            /* 預留與下一張還沒滑上來的卡片的距離 150px */
+            background: var(--white);
+            /* 卡片底色白色 */
+            border-radius: 24px;
+            /* 設定很大的漂亮圓角 24px */
+            display: flex;
+            /* 卡片內部將分為左右兩塊 (大標題與細節內容)，採用 Flex 橫向排版 */
+            overflow: hidden;
+            /* 切齊子元素超出邊界的底色，維持圓角乾淨 */
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            /* 巨大且擴散很開的黑色軟陰影，增強層次與質感 */
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            /* 卡片位置相關的平滑過渡設定 */
+            border: 1px solid rgba(197, 160, 89, 0.1);
+            /* 卡片邊緣添加一層極淡金色的微外框線 */
+        }
+
+        /* 工程獎項：左重右輕 */
+        .card-tech {
+            /* 用於修飾 MILESTONES 卡片的特殊樣式微調 */
+            background: linear-gradient(145deg, #ffffff, #f9f9f9);
+            /* 微弱斜向白與灰白漸層，增加紙張真實感 */
+        }
+
+        .card-tech .card-side {
+            /* 卡片左半邊 (深色/顯示比賽大標的區域) */
+            width: 35%;
+            /* 佔據卡片寬度的 35% 比例 */
+            background: var(--text-dark);
+            /* 將這塊的預設底色塗為黑色深灰底 */
+            color: var(--white);
+            /* 文字反白處理 */
+            padding: 40px;
+            /* 內邊距保留 40px 空間 */
+            display: flex;
+            /* 內部使用 Flexbox 排版 */
+            flex-direction: column;
+            /* 將內容直向 (上下) 堆疊排列 */
+            justify-content: center;
+            /* 將內容整個垂直置中於左側區塊 */
+        }
+
+        .card-main {
+            /* 卡片右半邊 (顯示詳情說明內容區) */
+            flex: 1;
+            /* 佔據卡片橫向所有剩餘的空間 (即另外的 65%) */
+            padding: 50px;
+            /* 大面積內邊距 50px */
+        }
+
+        /* 藝術插曲：漂浮小卡片 (打破格線) */
+        .art-float {
+            /* 這部分雖未出現在目前的 HTML 中，但設計目的是裝飾卡片右下角並飄出卡片外的小照片圖卡 */
+            position: absolute;
+            /* 絕對定位於滿版卡片上層 */
+            right: -30px;
+            /* 超出卡片原本的右側邊界 30px */
+            bottom: -60px;
+            /* 超出卡片原本的底部邊界往下掛 60px，製造打破生硬四方排版格線的破格美學 */
+            width: 320px;
+            /* 寬度 320px */
+            height: 400px;
+            /* 高度 400px，比例狹長像明信片 */
+            background: var(--white);
+            /* 漂浮卡白底 */
+            padding: 15px;
+            /* 仿製拍立得照片留白邊距 */
+            border-radius: 12px;
+            /* 小圓角 */
+            box-shadow: 15px 15px 40px rgba(0, 0, 0, 0.1);
+            /* 右下方拉出長陰影營造高度落差懸浮感 */
+            transform: rotate(5deg);
+            /* 稍微隨意傾斜 5 度放置 */
+            z-index: 5;
+            /* 確保能夠浮在父卡片圖文的上方 */
+            transition: var(--transition);
+            /* 平滑過渡 */
+        }
+
+        .art-float:hover {
+            /* 漂浮卡互動懸浮狀態 */
+            transform: rotate(0deg) translateY(-20px) scale(1.05);
+            /* 轉正、往上漂浮、並微量放大 */
+            z-index: 10;
+            /* 將圖層層級推至最頂，不會被下方滾動的項目蓋過 */
+        }
+
+        .art-img-wrapper {
+            /* 漂浮卡內的相片本身容器 */
+            width: 100%;
+            /* 寬度滿版 (扣除 padding) */
+            height: 80%;
+            /* 佔據卡片 80% 高度，預留下方 20% 放解說字 */
+            border-radius: 8px;
+            /* 相片內框切出更小圓角 */
+            overflow: hidden;
+            /* 防止照片超出圓角 */
+            background: #f0f0f0;
+            /* 無圖時的淡灰底色預設區塊 */
+        }
+
+        .art-caption {
+            /* 漂浮卡片照片底部手寫感的說明文字 */
+            padding: 15px 5px;
+            /* 內距微調排版 */
+            font-style: italic;
+            /* 斜體字增加草寫藝術感 */
+            color: var(--text-light);
+            /* 淡色文字 */
+            font-size: 0.9rem;
+            /* 字體大小 */
+        }
+
+        .award-badge {
+            /* 出現在卡片左側頂部的長條形徽章，寫著 WINNER、GLOBAL */
+            display: inline-block;
+            /* 允許設定寬高與內距，但行為像 inline 文字不隨意折行佔滿寬 */
+            padding: 6px 15px;
+            /* 上下 6px、左右 15px 讓其呈扁平長方形 */
+            background: var(--accent);
+            /* 徽章背景強烈主色調 */
+            color: var(--white);
+            /* 文字反白 */
+            border-radius: 4px;
+            /* 極小圓角 4px 看起來較硬朗精細 */
+            font-size: 0.8rem;
+            /* 字體較小 0.8rem */
+            font-weight: 700;
+            /* 加粗 */
+            letter-spacing: 2px;
+            /* 字距拉開 2px 顯得更精緻大氣 */
+            margin-bottom: 20px;
+            /* 距離下方的 H3 標題距離 20px */
+        }
+
+        .year-indicator {
+            /* 出現在卡片右半部作為底圖修飾的巨大「半透明年份數字浮水印」 */
+            font-family: serif;
+            /* 特別改採襯線字體，增加類似報紙古典感與莊重正式感 */
+            font-size: 4rem;
+            /* 4rem 超級大字體 */
+            opacity: 0.1;
+            /* 重點！透明度大幅降低只剩 10%，只當作底部的浮水印點綴使用，不干擾內文閱讀 */
+            position: absolute;
+            /* 絕對定位，抽離文本流 */
+            bottom: 20px;
+            /* 定位在卡片的右下方角落 */
+            right: 40px;
+            font-weight: 900;
+            /* 極重度的粗字體 */
+        }
+
+        /* 響應式：手機版恢復垂直排列 */
+        @media (max-width: 850px) {
+
+            /* 當瀏覽器螢幕寬度小於或等於 850px (例如平板裝置與手機) 時套用此區塊設定 */
+            .dossier-card {
+                flex-direction: column;
+                /* 將大卡片左黑右白的排版，從左右「併排(row)」改為上下「垂直堆疊(column)」 */
+                top: 100px;
+                /* 黏性置頂 (sticky) 時的頂端高度往上移至 100px，適應更狹小的螢幕可見空間 */
+            }
+
+            .card-tech .card-side {
+                width: 100%;
+                /* 由於已經改為上下堆疊，原本左側的深色區塊現在改為橫向佔據滿寬 100% 成為卡片的頂部橫向標題條 */
+                padding: 25px;
+                /* 內緣留白稍微縮小節省空間 */
+            }
+
+            .art-float {
+                position: relative;
+                /* 如果有漂浮相片卡片，移除其絕對定位，回歸正常由上到下的文件流排版 */
+                right: 0;
+                bottom: 0;
+                /* 歸零位置 */
+                width: 100%;
+                /* 寬高自適應成滿寬容器 */
+                height: auto;
+                margin-top: 20px;
+                /* 上方加點間距避免黏在一起 */
+                transform: none;
+                /* 移除原本美觀用的不規則旋轉與傾斜效果，求手機端畫面乾淨易讀 */
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            /* 當螢幕更窄，縮小到大約一般手機的尺寸 600px 以下時額外覆蓋設定 */
+            .timeline-info {
+                flex-direction: column;
+                /* (v2版本)讓時間軸內文跟預覽圖片從左右併排變為上下堆疊 */
+            }
+
+            .timeline-art-preview {
+                width: 100%;
+                /* (v2版本)將預覽相片縮圖變為滿畫面寬度 */
+                height: 150px;
+                /* 高度限制 150px，變成長方形橫幅照 */
+            }
+        }
+
+        /* ================= 響應式設定 (RWD) ================= */
+        @media (max-width: 992px) {
+
+            /* 針對中等尺寸與小型平板螢幕 (992px 以下) 設定 */
+            .gallery {
+                column-count: 2;
+                /* 畫面空間縮小，將作品集圖片區的瀑布流自動適應，從原本寬裕的 3 欄減成 2 欄 */
+            }
+
+            .hero h1 {
+                font-size: 3.5rem;
+                /* 將首頁大標姓名文字縮小至 3.5rem，以免字距過大超出視窗外緣 */
+            }
+        }
+
+        @media (max-width: 768px) {
+            /* 針對平板直向尺寸 (768px 以下) 以及這組代碼中尚未用到的技能樹特效額外除錯與調整 */
+
+            /* 在平板與手機版，將雙主線摺疊為單一直線 (以下這段針對預留的 .skill-tree 節點做 RWD，雖然你目前 HTML 還沒實裝這套技能樹) */
+            .skill-tree::before {
+                left: 30px;
+                /* 將可能存在的技能樹主線網左側靠齊邊緣 */
+            }
+
+            .tree-node {
+                width: 100%;
+                /* 技能樹分支節點寬度改為滿版寬 */
+                text-align: left;
+                /* 將文字強制改為從左至右排 (原可能為置中) */
+                padding-left: 70px;
+                /* 左側留出巨大空間給統一靠左的圖示和小線條 */
+                padding-right: 0;
+                /* 清除右側不必要的內距 */
+                left: 0 !important;
+                /* !important 強制蓋過所有其他規則原本分配的 left 定位，強制靠左歸零 */
+                transform: none !important;
+                /* 取消所有的位移錯位形變特效，避免在小螢幕歪七扭八 */
+                margin-bottom: 40px;
+                /* 節點項目下方的上下距離 40px */
+            }
+
+            /* 統一卡片邊框方向 (將雙向分支統一為單側) */
+            .tech-node .node-content {
+                border-right: none;
+                /* 移除科技節點原先位在右側的修飾邊框 */
+                border-left: 4px solid var(--tech-color);
+                /* 將修飾/強調顏色的邊框統一改放在左側 */
+            }
+
+            .fusion-node {
+                width: 100%;
+                /* 綜合節點滿版寬 */
+                padding-left: 70px;
+                /* 統一內縮長度與上述其他節點完全切齊 */
+            }
+
+            /* 統一 Icon 位置 (將錯落的點統整到一直線) */
+            .tech-node .node-icon,
+            .art-node .node-icon,
+            .fusion-node .node-icon {
+                left: 10px;
+                /* 技能樹的小圖標統一固定排列在卡片內距離左邊界 10px 處，串成直排 */
+                right: auto;
+                /* 清除原本可能向右靠齊的 CSS 屬性 */
+                top: 20px;
+                /* 距離頂部 20px */
+                transform: none;
+                /* 移除中心位移補償計算 */
+                width: 40px;
+                height: 40px;
+                /* 圖示容器等比縮小為 40x40px 體積 */
+                font-size: 1.1rem;
+                /* 內部字體的標籤同步等比例縮小 */
+            }
+
+            .tech-node::after,
+            .art-node::after {
+                display: none;
+                /* 隱藏原本橫向連接左右兩邊分支的連通虛線或橫線段 */
+            }
+
+            /* 修正手機版懸浮動畫方向 */
+            .tech-node .node-content:hover,
+            .art-node .node-content:hover {
+                transform: translateX(5px) translateY(-3px);
+                /* 不論是哪種節點被觸碰，都統一改為往右上微微漂浮位移，不再區分左右往中間靠的位移動畫 */
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            /* 針對手機等極小螢幕的最終大改造與大幅版面壓縮微調 */
+            .gallery {
+                column-count: 1;
+                /* 手機螢幕極窄，將作品集圖片區的瀑布流變成最簡單的單欄式佈局，圖形一張接著一張往下全版展開 */
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+                /* 首頁姓名主標題進一步大減至 2.5rem，適應手機尺寸 */
+                letter-spacing: 0.15em;
+                /* 為了避免手機換行破版，大字的字距也減半 */
+                text-indent: 0.15em;
+                /* 縮排長度同步配合減半對齊 */
+            }
+
+            .hero p.subtitle {
+                font-size: 1rem;
+                /* 副標題縮微至 1rem */
+                letter-spacing: 6px;
+                /* 同樣減少這行裝飾文字一半的字元間距 */
+                text-indent: 6px;
+                /* 同步對齊修正字距位移 */
+            }
+
+            .hero-desc {
+                font-size: 0.95rem;
+                /* 下方的兩行說明文字微微縮小字體一點點 */
+                letter-spacing: 3px;
+                /* 縮小字距，避免單行無法在手機內呈現足夠文字量 */
+            }
+
+            .navbar {
+                gap: 15px;
+                /* 導覽列選單 5 顆按鈕的間距從原本超寬裕的 60px 壓縮大減至 15px，讓它們並肩擠進小螢幕 */
+                padding: 15px 0;
+                /* 上下內距也大幅度縮減，盡可能讓出畫面垂直視角高度 */
+            }
+
+            .navbar a {
+                font-size: 0.85rem;
+                /* 將每個導覽列的字體字縮小至 0.85rem */
+                letter-spacing: 1px;
+                /* 字距大幅縮減，擠緊字元 */
+            }
+
+            .section {
+                padding: 80px 20px;
+                /* 將手機版各個子內容區塊(Section)的上下的間距，從誇張空曠的 120px 減短為 80px，減少手機無謂的過多滑動空白空洞感 */
+            }
+
+            .hero-action {
+                flex-direction: column;
+                /* 由於手機橫向無法同時塞入兩顆細長的 CTA 按鈕，在此轉向變為上下垂直堆疊排列 */
+                gap: 15px;
+                /* 上下兩顆按鈕的垂直相隔距離為 15px */
+            }
+
+            .timeline {
+                padding-left: 20px;
+                /* 一般經歷的時間軸左側留出的空間變小，幫內文多擠出一點螢幕寬 */
+            }
+
+            .timeline-dot {
+                left: -27px;
+                /* 由於上方 padding-left 減少了 10px，所以這裡這顆時間軸的金屬裝飾圓點，也要跟著從 -37px 修改為向左偏移 -27px 來重新對齊直向的這條參考線 */
+            }
+        }
+
+        /* ================= 最終榮譽卡片 (Honor Card) - 高級側排版升級 ================= */
+        .card-honor {
+            background: linear-gradient(135deg, #ffffff 0%, #fffbf2 100%);
+            border: 2px solid var(--accent) !important;
+            /* 強化金色邊框 */
+            display: flex;
+            /* 改回 flex，但內容置中 */
+            flex-direction: column;
+            /* 設為垂直排列 */
+            align-items: center;
+            /* 內容水平置中 */
+            padding: 60px 40px;
+            position: relative;
+            /* 作為定位基準 */
+            overflow: hidden;
+            /* 確保內容不溢出 */
+        }
+
+        /* 勳章區塊 */
+        .honor-seal {
+            font-size: 5rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+            opacity: 0.8;
+            animation: pulse 2s infinite;
+            /* 增加一個微弱的呼吸動畫 */
+        }
+
+        /* 主要榮譽文字 (確保最優閱讀性) */
+        .honor-text-wrapper {
+            text-align: center;
+            max-width: 700px;
+            width: 100%;
+            margin-bottom: 50px;
+            /* 與漂浮卡片拉開間距 */
+        }
+
+        .honor-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            letter-spacing: 4px;
+            margin-bottom: 15px;
+        }
+
+        .honor-desc {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            line-height: 2;
+        }
+
+        /* 漂浮卡片的專屬定位 */
+        .card-honor .art-float {
+            position: absolute;
+            /* 使用絕對定位 */
+            right: 5%;
+            /* 靠右對齊，但不擋字 */
+            bottom: -60px;
+            /* 稍微溢出，更有設計感 */
+            width: 280px;
+            /* 調整卡片大小 */
+            height: 350px;
+            transform: rotate(-5deg);
+            /* 保持斜向設計 */
+            z-index: 10;
+            /* 層級最高 */
+        }
+
+        .card-honor .art-float .art-img-wrapper {
+            height: 80%;
+            /* 圖片佔比 */
+        }
+
+        /* 響應式：手機版恢復單線垂直排列 */
+        @media (max-width: 850px) {
+            .card-honor {
+                flex-direction: column;
+                /* 統一垂直排列 */
+                padding: 40px 20px;
+                /* 手機版間距 */
+            }
+
+            .honor-text-wrapper {
+                margin-bottom: 30px;
+                /* 減少間距 */
+            }
+
+            .honor-title {
+                font-size: 1.8rem;
+                /* 手機版標題縮小 */
+                letter-spacing: 2px;
+            }
+
+            /* 手機版將圖片卡片變為局部內容，不再懸浮 */
+            .card-honor .art-float {
+                position: relative;
+                /* 手機版轉為相對定位 */
+                right: 0;
+                bottom: 0;
+                width: 100%;
+                /* 寬度佔滿 */
+                height: auto;
+                transform: rotate(3deg);
+                /* 調整角度，更有設計感 */
+                margin-top: 20px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            }
+
+            .card-honor .art-float:hover {
+                transform: rotate(0deg) translateY(-5px);
+                /* 調整手機版懸浮 */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="#about">關於我</a>
+        <a href="#skills">技術與藝術</a>
+        <a href="#projects">作品集</a>
+        <a href="#experience">經歷</a>
+        <a href="#contact">聯絡</a>
+    </nav>
+
+    <section class="hero">
+        <div class="reveal">
+            <h1>黃士庭</h1>
+            <p class="subtitle">SOFTWARE ENGINEER ✕ ILLUSTRATOR</p>
+            <p class="hero-desc">
+                在理性的資工邏輯與感性的美學之間，創造無限可能。<br>
+                熱衷於將程式碼化為流暢的互動體驗，同時以日系水彩描繪世界。
+            </p>
+            <div class="hero-action">
+                <a href="#projects" class="btn-cta"><i class="fas fa-palette"></i>VIEW PROJECTS</a>
+                <a href="#experience" class="btn-cta"><i class="fas fa-trophy"></i>VIEW EXPERIENCE</a>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <section id="about" class="section reveal">
+            <h2 class="section-title">ABOUT ME</h2>
+            <div
+                style="max-width: 800px; margin: auto; text-align: center; font-weight: 400; font-size: 1.1rem; line-height: 2;">
+                <p>目前就讀於國立高雄科技大學資訊工程系。<br>
+                    在鑽研 C、Python、資料結構與演算法等技術底蘊，並熟悉網頁與遊戲開發的同時，我也持續精進日系與水彩風格的插畫創作。<br>
+                    我相信邏輯思維與藝術美學能夠相輔相成，期許自己成為具備深厚工程實力與敏銳美學素養的雙棲創作者。</p>
+            </div>
+        </section>
+
+        <section id="skills" class="section reveal">
+            <h2 class="section-title">SKILLS</h2>
+            <div class="skills-wrapper">
+                <div class="skill-category">
+                    <h3><i class="fas fa-laptop-code"></i>Tech Skills</h3>
+                    <div class="skill-tags">
+                        <span>C / C++</span>
+                        <span>Python</span>
+                        <span>HTML / CSS</span>
+                        <span>Data Structures</span>
+                        <span>Algorithms</span>
+                        <span>Unity Engine</span>
+                    </div>
+                </div>
+                <div class="skill-category">
+                    <h3><i class="fas fa-paint-brush"></i>Art & Design</h3>
+                    <div class="skill-tags">
+                        <span>日系插畫</span>
+                        <span>水彩風格</span>
+                        <span>Procreate</span>
+                        <span>Photoshop</span>
+                        <span>角色設計</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="section reveal">
+            <h2 class="section-title">PORTFOLIO</h2>
+
+            <div class="filter-btns">
+                <button class="filter-btn active" data-filter="all">全部 All</button>
+                <button class="filter-btn" data-filter="coding">程式專案 Coding</button>
+                <button class="filter-btn" data-filter="art">插畫設計 Illustration</button>
+            </div>
+
+            <div class="gallery">
+                <div class="gallery-item art" data-category="art">
+                    <img src="ART20251112.png" alt="日系水彩插畫 1">
+                </div>
+                <div class="gallery-item coding" data-category="coding">
+                    <img src="Akaza.jpg" alt="網頁開發專案截圖">
+                </div>
+                <div class="gallery-item art" data-category="art">
+                    <img src="white.jpg" alt="角色設計插畫">
+                </div>
+                <div class="gallery-item coding" data-category="coding">
+                    <img src="hands.jpg" alt="演算法視覺化專案">
+                </div>
+                <div class="gallery-item art" data-category="art">
+                    <img src="billie.jpg" alt="場景概念圖">
+                </div>
+                <div class="gallery-item coding" data-category="coding">
+                    <img src="blue.png" alt="Unity 遊戲畫面">
+                </div>
+                <div class="gallery-item coding" data-category="coding">
+                    <img src="woman.jpg" alt="Unity 遊戲畫面">
+                </div>
+                <div class="gallery-item art" data-category="art">
+                    <img src="Fujii.jpg" alt="日系水彩插畫 1">
+                </div>
+
+            </div>
+        </section>
+
+        <section id="experience" class="section reveal">
+            <h2 class="section-title">THE MILESTONES</h2>
+
+            <div class="dossier-container">
+
+                <div class="dossier-card card-tech" style="top: 210px;">
+                    <div class="card-side">
+                        <span class="award-badge" style="background: var(--accent);">FINALIST</span>
+                        <h3 style="font-size: 2rem; margin: 0;">高雄市2023Maker創意發明競賽</h3>
+                        <p>市區賽</p>
+                    </div>
+                    <div class="card-main">
+                        <span class="year-indicator">2023</span>
+                        <h3 class="timeline-title">第二、三名、優等、佳作四獎</h3>
+                        <p>這是一次關於團隊協作與系統優化的深度實踐。我們挑戰了技術難點，最終在全國決賽中奪得佳績。</p>
+                    </div>
+                </div>
+                <div class="dossier-card card-tech" style="top: 210px;">
+                    <div class="card-side">
+                        <span class="award-badge">WINNER</span>
+                        <h3 style="font-size: 2.5rem; margin: 0;">2024IEYI世界青少年發明展</h3>
+                        <p>臺灣選拔賽</p>
+                    </div>
+                    <div class="card-main">
+                        <span class="year-indicator">2024</span>
+                        <h3 class="timeline-title">榮獲 金、銀、銅牌三獎</h3>
+                        <p>在軟硬體整合的賽道上，展現了從邏輯構思到成品製作的全方位實力。這是工程之路的起點，也是技術實力的最高證明。</p>
+                    </div>
+                </div>
+
+                <div class="dossier-card card-tech" style="top: 210px;">
+                    <div class="card-side" style="background: var(--accent);">
+                        <span class="award-badge" style="background: #2d2d2d;">FINALIST</span>
+                        <h3 style="font-size: 2rem; margin: 0;">全國高級中等職業學校專題競賽</h3>
+                        <p>全國賽</p>
+                    </div>
+                    <div class="card-main">
+                        <span class="year-indicator">2024</span>
+                        <h3 class="timeline-title">第二名</h3>
+                        <p>這是一次關於團隊協作與系統優化的深度實踐。我們挑戰了技術難點，最終在全國決賽中奪得佳績。</p>
+                    </div>
+                </div>
+
+                <div class="dossier-card card-tech" style="top: 210px;">
+                    <div class="card-side" style="background: var(--accent);">
+                        <span class="award-badge" style="background: #2d2d2d;">GLOBAL</span>
+                        <h3 style="font-size: 2.5rem; margin: 0;">2024 IEYI World Contest</h3>
+                        <p>世界賽</p>
+                    </div>
+                    <div class="card-main">
+                        <span class="year-indicator">2024</span>
+                        <h3 class="timeline-title">佳作</h3>
+                        <p>站上國際舞台，與全球創客交流。這不僅是一面銀牌，更是技術視野從台灣邁向全球的轉折點。</p>
+                    </div>
+                </div>
+
+                <div class="dossier-card card-tech" style="top: 210px;">
+                    <div class="card-side">
+                        <span class="award-badge" style="background: var(--accent);">FINALIST</span>
+                        <h3 style="font-size: 2.5rem; margin: 0;">2025IEYI世界青少年發明展</h3>
+                        
+                        <p>臺灣選拔賽</p>
+                    </div>
+                    <div class="card-main">
+                        <span class="year-indicator">2025</span>
+                        <h3 class="timeline-title">銀牌獎</h3>
+
+                        <p>這是一次關於團隊協作與系統優化的深度實踐。我們挑戰了技術難點，最終在全國決賽中奪得佳績。</p>
+                    </div>
+                </div>
+
+                <div class="dossier-card card-honor" style="top: 100px; z-index: 20;">
+                    <div class="honor-seal">
+                        <i class="fas fa-award"></i>
+                    </div>
+
+                    <span class="award-badge" style="background: var(--text-dark); margin-bottom: 30px;">
+                        TOP HONOR · 最高殊榮
+                    </span>
+
+                    <div class="honor-text-wrapper reveal">
+                        <h3 class="honor-title">114學年度 全國技藝教育績優人員</h3>
+
+                        <div class="honor-desc">
+                            <p>
+                                這不僅是一個獎項，更是對過去多年在「資訊工程」與「實作技藝」領域持續深耕的最高肯定。<br>
+                                從全台眾多優秀人才中脫穎而出，代表著技藝精湛與教育貢獻的完美結合。
+                            </p>
+                        </div>
+                    </div>
+
+
+                    <span class="year-indicator" style="opacity: 0.05; font-size: 8rem;">2025</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="section reveal" style="text-align: center;">
+            <h2 class="section-title">CONTACT</h2>
+            <div class="hero-action">
+                <a href="https://discord.com" target="_blank" class="btn-cta">
+                    <i class="fa-brands fa-discord"></i> Discord
+                </a>
+                <a href="https://instagram.com/你的IG帳號" target="_blank" class="btn-cta">
+                    <i class="fa-brands fa-instagram"></i> Instagram
+                </a>
+                <a href="https://github.com/你的GitHub帳號" target="_blank" class="btn-cta">
+                    <i class="fa-brands fa-github"></i> GitHub
+                </a>
+                <a href="https://github.com/你的GitHub帳號" target="_blank" class="btn-cta">
+                    <i class="fa-brands fa-facebook"></i> Facebook
+                </a>
+            </div>
+            <p style="font-size: 1.1rem; font-weight: 500; margin-top: 40px;">
+                Email: <a href="mailto:C114151101@nkust.edu.tw"
+                    style="color: var(--accent); text-decoration: none;">C114151101@nkust.edu.tw</a>
+            </p>
+            <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 20px;">
+                © 2026 黃士庭 Shi-Ting Huang. All Rights Reserved.
+            </p>
+        </section>
+    </div>
+
+    <div id="lightbox" class="lightbox">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightbox-img" src="" alt="Enlarged Project">
+    </div>
+
+    <script>
+        // ========= 作品集分類濾鏡 (Portfolio Filter) =========
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const galleryItems = document.querySelectorAll('.gallery-item');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 1. 移除所有按鈕的 active 狀態，並為點擊的按鈕加上
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // 2. 取得該按鈕代表的分類 (all, coding, art)
+                const filterValue = btn.getAttribute('data-filter');
+
+                // 3. 遍歷所有作品，比對分類並隱藏/顯示
+                galleryItems.forEach(item => {
+                    if (filterValue === 'all' || item.getAttribute('data-category') === filterValue) {
+                        item.classList.remove('hide');
+                    } else {
+                        item.classList.add('hide');
+                    }
+                });
+            });
+        });
+
+        // ========= 燈箱 (Lightbox) 邏輯 =========
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const galleryImages = document.querySelectorAll('.gallery-item img');
+
+        galleryImages.forEach(img => {
+            img.addEventListener('click', function () {
+                lightboxImg.src = this.src;
+                lightbox.classList.add('active');
+            });
+        });
+
+        lightbox.addEventListener('click', function (e) {
+            if (e.target !== lightboxImg) {
+                this.classList.remove('active');
+            }
+        });
+
+        // ========= 滾動浮現動畫 (Intersection Observer) =========
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target); // 顯示後解除觀察，節省效能
+                }
+            });
+        }, { threshold: 0.15 }); // 當區塊出現 15% 時觸發
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>
 
