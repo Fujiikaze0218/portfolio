@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>黃士庭｜個人作品集</title>
+    <title>Daolilaxi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
@@ -158,13 +158,13 @@
 
         .hero h1 {
             /* 主視覺區塊的大標題 (姓名) */
-            font-size: 4.5rem;
+            font-size: 5.5rem;
             /* 設定極大的字體 4.5rem，極具視覺張力 */
             font-weight: 700;
             /* 設定字體為粗體 */
             margin: 0;
             /* 移除瀏覽器對 h1 預設的外邊距 */
-            letter-spacing: 0.3em;
+            letter-spacing: 0.2em;
             /* 增加極寬的字距 0.3em */
             text-indent: 0.3em;
             /* 首行縮排 0.3em。用來抵銷最後一個字的 letter-spacing 所造成的排版不對稱，讓整體完美置中 */
@@ -174,6 +174,22 @@
             /* 將背景裁剪至只保留文字的形狀範圍內 (Safari/Chrome 前綴) */
             -webkit-text-fill-color: transparent;
             /* 將文字本身原本的填色設為透明，讓底下的漸層背景能夠透出來 */
+        }
+
+        .hero p.subtitle {
+            font-size: 1.5rem;
+            /* 字體可以稍微放大一點，因為字數變少了 */
+            letter-spacing: 15px;
+            /* 增加字距，讓它更有大牌設計師的氣場 */
+            color: var(--text-light);
+            font-weight: 300;
+        }
+
+        .multiply {
+            color: var(--accent);
+            /* 讓中間的乘號變成金色 */
+            font-weight: 700;
+            margin: 0 10px;
         }
 
         .hero p.subtitle {
@@ -990,7 +1006,7 @@
             /* 寬度填滿整個 1000px 的容器寬度 */
             min-height: 450px;
             /* 確保不管字數多寡，這張卡片最少有 350px 的固定高度 */
-            margin-bottom: 150px;
+            margin-bottom: 50px;
             /* 預留與下一張還沒滑上來的卡片的距離 150px */
             background: var(--white);
             /* 卡片底色白色 */
@@ -1465,6 +1481,17 @@
                 /* 調整手機版懸浮 */
             }
         }
+
+
+
+        /*============================HTML 作品集按鈕=======================
+        
+        <div class="filter-btns">
+                <button class="filter-btn active" data-filter="all">全部 All</button>
+                <button class="filter-btn" data-filter="coding">程式專案 Coding</button>
+                <button class="filter-btn" data-filter="art">插畫設計 Illustration</button>
+            </div>
+        */
     </style>
 </head>
 
@@ -1479,15 +1506,16 @@
 
     <section class="hero">
         <div class="reveal">
-            <h1>黃士庭</h1>
-            <p class="subtitle">SOFTWARE ENGINEER ✕ ILLUSTRATOR</p>
+            <h1>Daolilaxi</h1>
+            <p class="subtitle">ART<span class="multiply">✕</span>CODE</p>
             <p class="hero-desc">
-                在理性的資工邏輯與感性的美學之間，創造無限可能。<br>
-                熱衷於將程式碼化為流暢的互動體驗，同時以日系水彩描繪世界。
+                歡迎來到我的個人作品集網站!<br>
+                在資訊工程的理性邏輯與現代藝術的感性美學之間找尋平衡<br>
+                以左手構築程式世界之餘，也享受右手筆尖留下的墨水痕跡
             </p>
             <div class="hero-action">
-                <a href="#projects" class="btn-cta"><i class="fas fa-palette"></i>VIEW PROJECTS</a>
-                <a href="#experience" class="btn-cta"><i class="fas fa-trophy"></i>VIEW EXPERIENCE</a>
+                <a href="#projects" class="btn-cta"><i class="fas fa-palette"></i>VIEW ART</a>
+                <a href="#experience" class="btn-cta"><i class="fas fa-trophy"></i>VIEW AWARDS</a>
             </div>
         </div>
     </section>
@@ -1497,34 +1525,40 @@
             <h2 class="section-title">ABOUT ME</h2>
             <div
                 style="max-width: 800px; margin: auto; text-align: center; font-weight: 400; font-size: 1.1rem; line-height: 2;">
-                <p>目前就讀於國立高雄科技大學資訊工程系。<br>
-                    在鑽研 C、Python、資料結構與演算法等技術底蘊，並熟悉網頁與遊戲開發的同時，我也持續精進日系與水彩風格的插畫創作。<br>
-                    我相信邏輯思維與藝術美學能夠相輔相成，期許自己成為具備深厚工程實力與敏銳美學素養的雙棲創作者。</p>
+                <p>我目前就讀於國立高雄科技大學資訊工程系<br>
+                    專注於程式設計及軟硬體應用與開發<br>
+                    除了專研工程領域之外，我同時也投入於插畫創作<br>
+                    <br>
+                    在高職時期我曾參與過多項科技競賽與創新發明展<br>
+                    除了獲獎外，競賽中更是賦予了我寶貴的實作視野<br>
+                    因此我致力將其經驗融入實務能力並與現代藝術交織<br>
+                    於每一行程式與每一筆觸之間，在效能與美感兼具下構出最佳的數位體驗
+
+                </p>
             </div>
         </section>
 
         <section id="skills" class="section reveal">
-            <h2 class="section-title">SKILLS</h2>
+            <h2 class="section-title">SKILLS/Currently Learning</h2>
             <div class="skills-wrapper">
                 <div class="skill-category">
-                    <h3><i class="fas fa-laptop-code"></i>Tech Skills</h3>
+                    <h3><i class="fas fa-laptop-code"></i>Tech</h3>
                     <div class="skill-tags">
-                        <span>C / C++</span>
-                        <span>Python</span>
+                        <span>C / C# / C++</span>
+                        <span>Python / OpenCV</span>
                         <span>HTML / CSS</span>
-                        <span>Data Structures</span>
-                        <span>Algorithms</span>
                         <span>Unity Engine</span>
+                        <span>Arduino</span>
                     </div>
                 </div>
                 <div class="skill-category">
-                    <h3><i class="fas fa-paint-brush"></i>Art & Design</h3>
+                    <h3><i class="fas fa-paint-brush"></i>Art</h3>
                     <div class="skill-tags">
-                        <span>日系插畫</span>
-                        <span>水彩風格</span>
-                        <span>Procreate</span>
-                        <span>Photoshop</span>
-                        <span>角色設計</span>
+                        <span>Sketch</span>
+                        <span>Digital Painting </span>
+                        <span>Hand Drawn</span>
+                        <span>Illustration</span>
+                        <span>CLIP Studio Paint</span>
                     </div>
                 </div>
             </div>
@@ -1533,11 +1567,6 @@
         <section id="projects" class="section reveal">
             <h2 class="section-title">PORTFOLIO</h2>
 
-            <div class="filter-btns">
-                <button class="filter-btn active" data-filter="all">全部 All</button>
-                <button class="filter-btn" data-filter="coding">程式專案 Coding</button>
-                <button class="filter-btn" data-filter="art">插畫設計 Illustration</button>
-            </div>
 
             <div class="gallery">
                 <div class="gallery-item art" data-category="art">
@@ -1580,9 +1609,12 @@
                         <p>市區賽</p>
                     </div>
                     <div class="card-main">
-                        <span class="year-indicator">2023</span>
+                        <span class="year-indicator">2023.12</span>
                         <h3 class="timeline-title">第二、三名、優等、佳作四獎</h3>
-                        <p>這是一次關於團隊協作與系統優化的深度實踐。我們挑戰了技術難點，最終在全國決賽中奪得佳績。</p>
+                        <p>作為生涯首次競賽，初次發表所感到的緊張與壓力讓我深刻體會到比賽的挑戰難度，成績的不理想也情有可原，粗糙的呈現手法
+                            、生疏的介紹詞，皆誠實的反映出了最終名次，但也因這次的失利讓我領悟到自身問題所在，作品過於粗糙、程式架構鬆散不完整，這些經驗也為我日後的比賽奠定了基礎。
+                            由於得了二、三名次，也因此取得IEYI選拔賽複賽資格。
+                        </p>
                     </div>
                 </div>
                 <div class="dossier-card card-tech" style="top: 210px;">
@@ -1592,9 +1624,9 @@
                         <p>臺灣選拔賽</p>
                     </div>
                     <div class="card-main">
-                        <span class="year-indicator">2024</span>
-                        <h3 class="timeline-title">榮獲 金、銀、銅牌三獎</h3>
-                        <p>在軟硬體整合的賽道上，展現了從邏輯構思到成品製作的全方位實力。這是工程之路的起點，也是技術實力的最高證明。</p>
+                        <span class="year-indicator">2024.1</span>
+                        <h3 class="timeline-title">金、銀、銅牌三獎</h3>
+                        <p>有了前車之鑑後，這次在軟硬體整合的過程有了更縝密的處理，同時在發表與呈現手法的部分也有所進步，最終也不負眾望的斬獲了金銀銅三獎，成功取得代表臺灣隊的資格並進軍國際賽。</p>
                     </div>
                 </div>
 
@@ -1605,9 +1637,10 @@
                         <p>全國賽</p>
                     </div>
                     <div class="card-main">
-                        <span class="year-indicator">2024</span>
+                        <span class="year-indicator">2024.5</span>
                         <h3 class="timeline-title">第二名</h3>
-                        <p>這是一次關於團隊協作與系統優化的深度實踐。我們挑戰了技術難點，最終在全國決賽中奪得佳績。</p>
+                        <p>在備戰IEYI國際賽的同時，也卯足全力投入全國專題競賽，結合了以往經驗，針對了整個系統架構進行重塑優化，並將物聯網技術整合進作品中，經過反覆測試與優化，不僅在技術上有更深的造詣，更是取得全國決賽第二名的肯定。
+                        </p>
                     </div>
                 </div>
 
@@ -1618,9 +1651,10 @@
                         <p>世界賽</p>
                     </div>
                     <div class="card-main">
-                        <span class="year-indicator">2024</span>
+                        <span class="year-indicator">2024.8</span>
                         <h3 class="timeline-title">佳作</h3>
-                        <p>站上國際舞台，與全球創客交流。這不僅是一面銀牌，更是技術視野從台灣邁向全球的轉折點。</p>
+                        <p>站上國際舞台，與來自各國的創客交流，這不僅是一場單純的比賽，更是一場跨越國界的技術對話。礙於英文能力不足，在面對國際評審時的理念傳達仍有很大的進步空間，導致最終名次止步於佳作，但也藉由這場賽事拓展了我的國際視野。
+                        </p>
                     </div>
                 </div>
 
@@ -1628,39 +1662,36 @@
                     <div class="card-side">
                         <span class="award-badge" style="background: var(--accent);">FINALIST</span>
                         <h3 style="font-size: 2.5rem; margin: 0;">2025IEYI世界青少年發明展</h3>
-                        
+
                         <p>臺灣選拔賽</p>
                     </div>
                     <div class="card-main">
-                        <span class="year-indicator">2025</span>
+                        <span class="year-indicator">2025.2</span>
                         <h3 class="timeline-title">銀牌獎</h3>
 
-                        <p>這是一次關於團隊協作與系統優化的深度實踐。我們挑戰了技術難點，最終在全國決賽中奪得佳績。</p>
+                        <p>有了前幾次競賽積累的技術經驗後，這次與隊友挑戰將研發重心轉向電腦視覺領域，運用OpenCV實作影像辨識，開發疲勞駕駛檢測系統，最終以銀牌作為結尾。</p>
                     </div>
                 </div>
 
-                <div class="dossier-card card-honor" style="top: 100px; z-index: 20;">
+                <div class="dossier-card card-honor" style="top: 50px; z-index: 20;">
                     <div class="honor-seal">
                         <i class="fas fa-award"></i>
                     </div>
-
-                    <span class="award-badge" style="background: var(--text-dark); margin-bottom: 30px;">
-                        TOP HONOR · 最高殊榮
-                    </span>
-
                     <div class="honor-text-wrapper reveal">
                         <h3 class="honor-title">114學年度 全國技藝教育績優人員</h3>
 
                         <div class="honor-desc">
                             <p>
-                                這不僅是一個獎項，更是對過去多年在「資訊工程」與「實作技藝」領域持續深耕的最高肯定。<br>
-                                從全台眾多優秀人才中脫穎而出，代表著技藝精湛與教育貢獻的完美結合。
+                                這不僅是一個獎項，對我來說是至高無上的殊榮，<br>
+                                更是對過去多年在資訊與實作技藝領域持續深耕的最高肯定。<br>
+                                也感謝每一位並肩奮鬥的隊友，以及主任與學長姊的細心栽培與教導<br>
+                                最終，以此為我的高職比賽生涯的畫下句號。
                             </p>
                         </div>
                     </div>
 
 
-                    <span class="year-indicator" style="opacity: 0.05; font-size: 8rem;">2025</span>
+                    <span class="year-indicator" style="opacity: 0.05; font-size: 8rem;">2025.5</span>
                 </div>
             </div>
         </section>
@@ -1668,25 +1699,25 @@
         <section id="contact" class="section reveal" style="text-align: center;">
             <h2 class="section-title">CONTACT</h2>
             <div class="hero-action">
-                <a href="https://discord.com" target="_blank" class="btn-cta">
+                <a href="https://www.youtube.com/watch?v=dMTy6C4UiQ4" target="_blank" class="btn-cta">
                     <i class="fa-brands fa-discord"></i> Discord
                 </a>
-                <a href="https://instagram.com/你的IG帳號" target="_blank" class="btn-cta">
+                <a href="https://www.youtube.com/watch?v=dMTy6C4UiQ4" target="_blank" class="btn-cta">
                     <i class="fa-brands fa-instagram"></i> Instagram
                 </a>
-                <a href="https://github.com/你的GitHub帳號" target="_blank" class="btn-cta">
+                <a href="https://www.youtube.com/watch?v=dMTy6C4UiQ4" target="_blank" class="btn-cta">
                     <i class="fa-brands fa-github"></i> GitHub
                 </a>
-                <a href="https://github.com/你的GitHub帳號" target="_blank" class="btn-cta">
+                <a href="https://www.youtube.com/watch?v=dMTy6C4UiQ4" target="_blank" class="btn-cta">
                     <i class="fa-brands fa-facebook"></i> Facebook
                 </a>
             </div>
             <p style="font-size: 1.1rem; font-weight: 500; margin-top: 40px;">
                 Email: <a href="mailto:C114151101@nkust.edu.tw"
-                    style="color: var(--accent); text-decoration: none;">C114151101@nkust.edu.tw</a>
+                    style="color: var(--accent); text-decoration: none;">qws2288@gmail.com</a>
             </p>
             <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 20px;">
-                © 2026 黃士庭 Shi-Ting Huang. All Rights Reserved.
+                © 2026 Daolilaxi. All Rights Reserved.
             </p>
         </section>
     </div>
@@ -1754,4 +1785,3 @@
 </body>
 
 </html>
-
