@@ -4,23 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>doyoda</title>
+    <title>doyoda | Illustration Portfolio</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;500;700;900&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Noto+Sans+TC:wght@300;500;700;900&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
     <style>
         /* ================= 變數設定區 ================= */
         :root {
             --accent: #c5a059;
-            --bg-gradient: linear-gradient(135deg, #ffffff 0%, #fdf9f1 100%);
             --text-dark: #2d2d2d;
             --text-light: #666666;
             --white: #ffffff;
             --transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
-            --current-brush-color: 59, 58, 54; /* 預設墨水顏色 RGB (全部/墨色) */
+            --current-brush-color: 59, 58, 54;
         }
 
-        /* ================= 水彩筆游標黑科技 ================= */
-        /* 將游標替換為神似圖片的藍柄金屬水彩筆 SVG，並將感應熱點精準對齊筆尖 (5, 27) */
+        /* ================= 水彩筆游標 ================= */
         html, body, a, .paint-swatch, .btn-cta, .gallery-item img {
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g transform="rotate(45 16 16)"><path d="M16 2 C18 2, 20 5, 20 20 L12 20 C12 5, 14 2, 16 2 Z" fill="%236b8cce"/><rect x="12" y="20" width="8" height="4" fill="%23cccccc"/><path d="M12 24 C12 28, 15 32, 16 32 C17 32, 20 28, 20 24 Z" fill="%23c5a059"/><path d="M14 24 L14 29 M18 24 L18 29 M16 24 L16 31" stroke="%238a6a32" stroke-width="0.5" fill="none"/></g></svg>') 5 27, auto !important;
         }
@@ -30,27 +28,51 @@
         
         body { 
             margin: 0; 
-            /* 將背景改為高質感的點陣繪圖紙 (Dot Grid Sketchbook) */
+            background-color: transparent; /* 將背景交給獨立的 .bg-texture */
+            font-family: 'Noto Sans TC', sans-serif; 
+            color: var(--text-dark); 
+            line-height: 1.8; 
+            overflow-x: hidden; 
+            user-select: none;
+        }
+
+        /* 🌟 修正點 1：獨立的點陣和紙背景層，解決 CSS 堆疊衝突 */
+        .bg-texture {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: #fdfbf7;
             background-image: 
                 radial-gradient(rgba(197, 160, 89, 0.15) 1.5px, transparent 1.5px),
                 linear-gradient(135deg, #ffffff 0%, #fdf9f1 100%);
             background-size: 25px 25px, 100% 100%;
-            background-attachment: fixed; /* 讓點陣網格固定，不隨滾動移動 */
-            font-family: 'Noto Sans TC', sans-serif; 
-            color: var(--text-dark); 
-            line-height: 1.8; 
-            overflow-x: hidden; 
+            z-index: -2; pointer-events: none;
         }
 
-        /* ================= 緩慢漂浮的水彩光暈 ================= */
-        .ambient-blobs { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; pointer-events: none; z-index: -1; }
-        .blob-1 { position: absolute; top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(197,160,89,0.06), transparent 60%); filter: blur(60px); animation: float1 18s infinite alternate ease-in-out; }
-        .blob-2 { position: absolute; bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(107,140,206,0.04), transparent 60%); filter: blur(60px); animation: float2 22s infinite alternate-reverse ease-in-out; }
+        /* 確保主要內容區塊在背景印記之上 */
+        .container, .hero { position: relative; z-index: 2; }
+
+        /* ================= 1. 四重水彩暈染背景 ================= */
+        /* 🌟 修正點 2：大幅提升光暈透明度，讓色彩浮現 */
+        .ambient-blobs { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; pointer-events: none; z-index: -1; mix-blend-mode: multiply; }
+        .blob-1 { position: absolute; top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(197,160,89,0.25), transparent 60%); filter: blur(60px); animation: float1 18s infinite alternate ease-in-out; }
+        .blob-2 { position: absolute; bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(107,140,206,0.2), transparent 60%); filter: blur(60px); animation: float2 22s infinite alternate-reverse ease-in-out; }
+        .blob-3 { position: absolute; top: 30%; right: -10%; width: 45vw; height: 45vw; background: radial-gradient(circle, rgba(212,122,126,0.2), transparent 60%); filter: blur(60px); animation: float3 25s infinite alternate ease-in-out; }
+        .blob-4 { position: absolute; bottom: 20%; left: -15%; width: 55vw; height: 55vw; background: radial-gradient(circle, rgba(130,201,166,0.2), transparent 60%); filter: blur(60px); animation: float4 20s infinite alternate-reverse ease-in-out; }
+        
         @keyframes float1 { to { transform: translate(10vw, 10vh) scale(1.15); } }
         @keyframes float2 { to { transform: translate(-10vw, -10vh) scale(0.9); } }
+        @keyframes float3 { to { transform: translate(-15vw, -5vh) scale(1.1); } }
+        @keyframes float4 { to { transform: translate(15vw, 15vh) scale(0.95); } }
 
-        /* ================= Canvas 畫布群 ================= */
+        /* ================= 2 & 3. 靜態飛濺金屬與永久印記畫布 ================= */
+        #splatter-canvas, #stamp-canvas {
+            position: absolute; /* 絕對定位，跟隨文件高度捲動 */
+            top: 0; left: 0;
+            pointer-events: none;
+            z-index: 0; /* 在內容的下方，但在背景紋理之上 */
+        }
+        #stamp-canvas { mix-blend-mode: multiply; }
+
+        /* ================= 其他 Canvas 畫布 ================= */
         #ink-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; pointer-events: auto; background: #fdfbf7; transition: opacity 1.8s ease; }
         #trail-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; pointer-events: none; mix-blend-mode: multiply; }
 
@@ -64,9 +86,34 @@
         .navbar a:hover { color: var(--accent); }
         .navbar a:hover::after { width: 100%; }
 
-        /* ================= Hero 首頁 ================= */
+        /* ================= Hero 首頁：逐字手寫與大頭像 ================= */
         .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        .hero h1 { font-size: 5.5rem; font-weight: 900; margin: 0; letter-spacing: 0.2em; text-indent: 0.2em; background: linear-gradient(135deg, #2d2d2d 0%, #c5a059 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .hero-title-group { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px; }
+
+        .hero-avatar-box {
+            width: 260px; height: 260px; border-radius: 50%; padding: 8px;
+            background: linear-gradient(135deg, var(--accent), #fdf9f1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            opacity: 0; transform: scale(0.5) rotate(-15deg);
+        }
+        .hero.hero-loaded .hero-avatar-box { animation: avatarPop 1s 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .hero-avatar-box img {
+            width: 100%; height: 100%; border-radius: 50%;
+            object-fit: cover; border: 5px solid #fff;
+            object-position: center 20%;
+        }
+        @keyframes avatarPop { to { opacity: 1; transform: scale(1) rotate(0deg); } }
+
+        .hero-signature { width: 1000px; height: 400px; }
+        .sig-text { font-family: 'Caveat', cursive; font-weight: 800; font-size: 13.5rem; letter-spacing: 1px; fill: url(#sigGrad); fill-opacity: 0; }
+        .char { stroke: var(--accent); stroke-width: 2.5px; stroke-dasharray: 600; stroke-dashoffset: 600; opacity: 0; }
+        .hero.hero-loaded .char { animation: drawChar 1.8s var(--delay) cubic-bezier(0.25, 1, 0.5, 1) forwards, fadeStroke 1.5s 5.5s ease forwards; }
+        .hero.hero-loaded .sig-text { animation: fillSig 2s 5.2s ease forwards; }
+        @keyframes drawChar { 0% { stroke-dashoffset: 600; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+        @keyframes fillSig { to { fill-opacity: 1; } }
+        @keyframes fadeStroke { to { stroke-opacity: 0; } }
+
         .hero p.subtitle { font-size: 1.5rem; letter-spacing: 15px; text-indent: 15px; color: var(--text-light); font-weight: 300; margin: 25px 0 20px; }
         .multiply { color: var(--accent); font-weight: 700; margin: 0 10px; }
         .hero-desc { font-size: 1.1rem; color: var(--text-light); letter-spacing: 5px; line-height: 2; margin: 0 0 45px; font-weight: 300; }
@@ -84,6 +131,9 @@
         #about { overflow: hidden; }
         .parallax-watermark { position: absolute; top: 20%; left: 50%; transform: translate(-50%, 0); font-family: 'Noto Serif TC', serif; font-weight: 900; font-size: 25rem; color: rgba(197, 160, 89, 0.05); pointer-events: none; white-space: nowrap; z-index: 0; line-height: 1; user-select: none; }
         .about-content { position: relative; z-index: 2; }
+
+        /* ================= 3D 懸浮追蹤卡片 ================= */
+        .tilt-card { position: relative; transform-style: preserve-3d; }
 
         /* ================= 技能區塊 ================= */
         .skills-wrapper { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; max-width: 900px; margin: 0 auto; }
@@ -127,9 +177,13 @@
 
         /* ================= 瀑布流畫廊 ================= */
         .gallery { column-count: 3; column-gap: 20px; width: 100%; }
-        .gallery-item { display: inline-block; width: 100%; margin-bottom: 20px; position: relative; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); background: #fff; opacity: 1; transform: translateY(0) scale(1); }
+        .gallery-item { 
+            display: inline-block; width: 100%; margin-bottom: 20px; position: relative; border-radius: 16px; overflow: hidden; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); background: #fff; 
+            opacity: 1; transform: translateY(0) scale(1); 
+        }
         .gallery-item img { width: 100%; height: auto; display: block; transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); }
-        .gallery-item:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(197, 160, 89, 0.2); z-index: 5; }
+        .gallery-item:hover { box-shadow: 0 25px 50px rgba(197, 160, 89, 0.25); z-index: 5; }
         .gallery-item:hover img { transform: scale(1.08); }
         .gallery-item.hide { display: none !important; }
         
@@ -141,7 +195,7 @@
         .lightbox.active { opacity: 1; pointer-events: all; }
         .lightbox img { max-width: 90%; max-height: 85vh; object-fit: contain; border-radius: 8px; transform: scale(0.9); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); }
         .lightbox.active img { transform: scale(1); }
-        .lightbox-close { position: absolute; top: 30px; right: 40px; color: rgba(255, 255, 255, 0.7); font-size: 50px; transition: var(--transition); line-height: 1; }
+        .lightbox-close { position: absolute; top: 30px; right: 40px; color: rgba(255, 255, 255, 0.7); font-size: 50px; cursor: pointer; transition: var(--transition); line-height: 1; }
         .lightbox-close:hover { color: #fff; transform: rotate(90deg); }
 
         /* ================= 響應式 ================= */
@@ -149,24 +203,34 @@
         @media (max-width: 992px) { 
             .portfolio-layout { flex-direction: column-reverse; align-items: center; gap: 60px; }
             .palette-sidebar { position: relative; top: 0; margin-bottom: 20px; width: 100%; margin-left: 0; justify-content: center; z-index: 60; }
-            .hero h1 { font-size: 3.5rem; } 
             .parallax-watermark { font-size: 15rem; top: 30%; }
         }
         @media (max-width: 600px) {
             .gallery { column-count: 1; }
-            .hero h1 { font-size: 2.5rem; letter-spacing: 0.1em; text-indent: 0.1em; }
             .navbar { gap: 20px; padding: 15px 0; }
             .navbar a { font-size: 0.85rem; letter-spacing: 1px; }
             .flat-palette { transform: rotate(-6deg) scale(0.75); }
+            .hero-title-group { flex-direction: column; gap: 15px; }
+            .hero-avatar-box { width: 160px; height: 160px; }
+            .hero-signature { width: 340px; height: 150px; }
+            .sig-text { font-size: 8rem; }
+            .hero p.subtitle { font-size: 1.1rem; letter-spacing: 8px; text-indent: 8px; }
         }
     </style>
 </head>
 
 <body>
+    <div class="bg-texture"></div>
+
     <div class="ambient-blobs">
         <div class="blob-1"></div>
         <div class="blob-2"></div>
+        <div class="blob-3"></div>
+        <div class="blob-4"></div>
     </div>
+
+    <canvas id="splatter-canvas"></canvas>
+    <canvas id="stamp-canvas"></canvas>
 
     <canvas id="ink-canvas"></canvas>
     <canvas id="trail-canvas"></canvas>
@@ -179,12 +243,34 @@
     </nav>
 
     <section class="hero">
+        <div class="hero-title-group">
+            <div class="hero-avatar-box">
+                <img src="avatar.webp" alt="doyoda avatar" onerror="this.src='https://ui-avatars.com/api/?name=D&background=c5a059&color=fff&size=200&font-size=0.4'">
+            </div>
+            
+            <svg class="hero-signature" viewBox="0 0 600 260">
+                <defs>
+                    <linearGradient id="sigGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#2d2d2d" />
+                        <stop offset="100%" stop-color="#c5a059" />
+                    </linearGradient>
+                </defs>
+                <text x="50%" y="68%" text-anchor="middle" class="sig-text">
+                    <tspan class="char" style="--delay: 0.5s;">d</tspan>
+                    <tspan class="char" style="--delay: 1.1s;" dx="-35">o</tspan>
+                    <tspan class="char" style="--delay: 1.7s;" dx="-35">y</tspan>
+                    <tspan class="char" style="--delay: 2.3s;" dx="-35">o</tspan>
+                    <tspan class="char" style="--delay: 2.9s;" dx="-35">d</tspan>
+                    <tspan class="char" style="--delay: 3.5s;" dx="-35">a</tspan>
+                </text>
+            </svg>
+        </div>
+
         <div class="reveal">
-            <h1>doyoda</h1>
-            <p class="subtitle">ART<span class="multiply">✕</span>CODE</p>
+            <p class="subtitle">ILLUSTRATION<span class="multiply">✕</span>DESIGN</p>
             <p class="hero-desc">
-                在資訊工程的理性邏輯與現代藝術的感性美學之間找尋平衡<br>
-                以左手構築程式世界之餘，也享受右手筆尖留下的墨水痕跡
+                捕捉光影的流動，將筆尖的溫度轉化為永恆的畫面<br>
+                專注於日系水彩與數位插畫的細膩表達
             </p>
             <div class="hero-action">
                 <a href="#projects" class="btn-cta"><i class="fas fa-palette"></i>VIEW ART GALLERY</a>
@@ -194,40 +280,40 @@
 
     <div class="container">
         <section id="about" class="section reveal">
-            <div class="parallax-watermark" id="watermark"></div>
+            <div class="parallax-watermark" id="watermark">創</div>
             <div class="about-content">
                 <h2 class="section-title">ABOUT ME</h2>
                 <div style="max-width: 800px; margin: auto; text-align: center; font-weight: 400; font-size: 1.1rem; line-height: 2;">
                     <p>
-                        目前就讀於國立高雄科技大學資訊工程系，專注於程式開發與軟硬體整合。<br>
-                        同時深耕於數位插畫創作，致力將科技的硬核實力與現代藝術的感性視覺交織，<br>
-                        在效能與美感兼具的原則下，建構出最具沉浸感的數位互動體驗。
+                        你好，我是 doyoda，一名熱愛日系美學的數位插畫家與設計師。<br>
+                        擅長在畫布上捕捉細膩的光影變化，並透過水彩的渲染與俐落的素描線條，賦予角色靈魂。<br>
+                        我相信藝術不只是視覺的展現，更是傳遞情感與故事的載體。
                     </p>
                 </div>
             </div>
         </section>
 
         <section id="skills" class="section reveal">
-            <h2 class="section-title">SKILLS</h2>
+            <h2 class="section-title">SKILLS & TOOLS</h2>
             <div class="skills-wrapper">
-                <div class="skill-category">
-                    <h3><i class="fas fa-laptop-code"></i>Tech</h3>
+                <div class="skill-category tilt-card">
+                    <h3><i class="fas fa-desktop"></i>Software</h3>
                     <div class="skill-tags">
-                        <span>C / C# / C++</span>
-                        <span>Python / OpenCV</span>
-                        <span>HTML / CSS</span>
-                        <span>Unity Engine</span>
-                        <span>Arduino / ESP32</span>
+                        <span>Clip Studio Paint</span>
+                        <span>Photoshop</span>
+                        <span>Procreate</span>
+                        <span>Illustrator</span>
+                        <span>InDesign</span>
                     </div>
                 </div>
-                <div class="skill-category">
-                    <h3><i class="fas fa-paint-brush"></i>Art</h3>
+                <div class="skill-category tilt-card">
+                    <h3><i class="fas fa-paint-brush"></i>Mediums</h3>
                     <div class="skill-tags">
                         <span>Digital Painting</span>
-                        <span>Watercolor Style</span>
+                        <span>Watercolor</span>
                         <span>Character Design</span>
-                        <span>Illustration</span>
-                        <span>CLIP Studio Paint</span>
+                        <span>Sketching</span>
+                        <span>Storyboarding</span>
                     </div>
                 </div>
             </div>
@@ -241,28 +327,28 @@
                     <canvas id="gallery-wipe-canvas"></canvas>
 
                     <div class="gallery">
-                        <div class="gallery-item" data-category="hand"><img src="hand/h_art1.webp" alt="手繪"></div>
-                        <div class="gallery-item" data-category="hand"><img src="hand/h_art2.webp" alt="手繪"></div>
-                        <div class="gallery-item" data-category="hand"><img src="hand/h_art3.webp" alt="手繪"></div>
-                        <div class="gallery-item" data-category="hand"><img src="hand/h_art4.webp" alt="手繪"></div>
-                        <div class="gallery-item" data-category="hand"><img src="hand/h_art5.webp" alt="手繪"></div>
-                        <div class="gallery-item" data-category="hand"><img src="hand/h_art6.webp" alt="手繪"></div>
-                        <div class="gallery-item" data-category="hand"><img src="hand/h_art7.webp" alt="手繪"></div>
-                        <div class="gallery-item" data-category="hand"><img src="hand/h_art8.webp" alt="手繪"></div>
-                        <div class="gallery-item" data-category="hand"><img src="hand/h_art9.webp" alt="手繪"></div>
-                        <div class="gallery-item" data-category="digital"><img src="digital/d_art1.webp" alt="電繪"></div>
-                        <div class="gallery-item" data-category="digital"><img src="digital/d_art2.webp" alt="電繪"></div>
-                        <div class="gallery-item" data-category="digital"><img src="digital/d_art3.webp" alt="電繪"></div>
-                        <div class="gallery-item" data-category="digital"><img src="digital/d_art4.webp" alt="電繪"></div>
-                        <div class="gallery-item" data-category="digital"><img src="digital/d_art5.webp" alt="電繪"></div>
-                        <div class="gallery-item" data-category="digital"><img src="digital/d_art6.webp" alt="電繪"></div>
-                        <div class="gallery-item" data-category="digital"><img src="digital/d_art7.webp" alt="電繪"></div>
-                        <div class="gallery-item" data-category="digital"><img src="digital/d_art8.webp" alt="電繪"></div>
-                        <div class="gallery-item" data-category="digital"><img src="digital/d_art9.webp" alt="電繪"></div>
-                        <div class="gallery-item" data-category="digital"><img src="digital/d_art10.webp" alt="電繪"></div>
-                        <div class="gallery-item" data-category="digital"><img src="digital/d_art11.webp" alt="電繪"></div>                          
-                        <div class="gallery-item" data-category="sketch"><img src="sketch/s_art1.webp" alt="素描"></div>
-                        <div class="gallery-item" data-category="sketch"><img src="sketch/s_art2.webp" alt="素描"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art1.webp" alt="手繪"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art2.webp" alt="手繪"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art3.webp" alt="手繪"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art4.webp" alt="手繪"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art5.webp" alt="手繪"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art6.webp" alt="手繪"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art7.webp" alt="手繪"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art8.webp" alt="手繪"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art9.webp" alt="手繪"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art1.webp" alt="電繪"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art2.webp" alt="電繪"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art3.webp" alt="電繪"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art4.webp" alt="電繪"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art5.webp" alt="電繪"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art6.webp" alt="電繪"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art7.webp" alt="電繪"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art8.webp" alt="電繪"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art9.webp" alt="電繪"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art10.webp" alt="電繪"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art11.webp" alt="電繪"></div>                          
+                        <div class="gallery-item tilt-card" data-category="sketch"><img src="sketch/s_art1.webp" alt="素描"></div>
+                        <div class="gallery-item tilt-card" data-category="sketch"><img src="sketch/s_art2.webp" alt="素描"></div>
                     </div>
                 </div>
 
@@ -323,7 +409,131 @@
     </div>
 
     <script>
-        // ================= 1. 首頁水墨進場 =================
+        // ================= 動態背景畫布引擎：靜態飛濺與永久印記 =================
+        const splatCanvas = document.getElementById('splatter-canvas');
+        const sCtx = splatCanvas.getContext('2d');
+        const stampCanvas = document.getElementById('stamp-canvas');
+        const stampCtx = stampCanvas.getContext('2d');
+        
+        let stamps = []; 
+
+        function resizeBackgroundCanvases() {
+            const docWidth = document.documentElement.scrollWidth;
+            const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+            
+            // 🌟 修正點 3：使用 ResizeObserver 確保高度準確計算，避免金箔只擠在畫面上方
+            if (splatCanvas.width !== docWidth || splatCanvas.height !== docHeight) {
+                splatCanvas.width = docWidth; 
+                splatCanvas.height = docHeight;
+                stampCanvas.width = docWidth; 
+                stampCanvas.height = docHeight;
+                
+                drawRandomSplatters();
+                stamps.forEach(s => renderSingleStamp(s.x, s.y, s.rgb));
+            }
+        }
+
+        function drawRandomSplatters() {
+            sCtx.clearRect(0, 0, splatCanvas.width, splatCanvas.height);
+            // 增量至 150 顆飛濺，並提高不透明度
+            for(let i=0; i<150; i++) {
+                let x = Math.random() * splatCanvas.width;
+                let y = Math.random() * splatCanvas.height;
+                let r = Math.random() * 3.5 + 1; // 放大斑點尺寸
+                sCtx.beginPath();
+                sCtx.arc(x, y, r, 0, Math.PI * 2);
+                sCtx.fillStyle = i < 75 ? 'rgba(197, 160, 89, 0.8)' : 'rgba(45, 45, 45, 0.5)'; 
+                sCtx.fill();
+            }
+        }
+        
+        const resizeObserver = new ResizeObserver(() => { resizeBackgroundCanvases(); });
+        resizeObserver.observe(document.body);
+        window.addEventListener('load', resizeBackgroundCanvases);
+
+        function renderSingleStamp(x, y, rgb) {
+            stampCtx.save();
+            stampCtx.globalCompositeOperation = 'multiply';
+            let baseRadius = Math.random() * 25 + 25; 
+            
+            for(let i=0; i<8; i++) {
+                stampCtx.beginPath();
+                let offsetX = (Math.random() - 0.5) * baseRadius;
+                let offsetY = (Math.random() - 0.5) * baseRadius;
+                stampCtx.arc(x + offsetX, y + offsetY, baseRadius * (Math.random() * 0.6 + 0.4), 0, Math.PI * 2);
+                stampCtx.fillStyle = `rgba(${rgb}, ${Math.random() * 0.04 + 0.01})`;
+                stampCtx.fill();
+            }
+            
+            for(let i=0; i<5; i++) {
+                stampCtx.beginPath();
+                let pX = x + (Math.random() - 0.5) * 80;
+                let pY = y + (Math.random() - 0.5) * 80;
+                stampCtx.arc(pX, pY, Math.random() * 3 + 1, 0, Math.PI * 2);
+                stampCtx.fillStyle = `rgba(${rgb}, ${Math.random() * 0.15 + 0.05})`;
+                stampCtx.fill();
+            }
+            stampCtx.restore();
+        }
+
+        function drawPermanentStamp(pageX, pageY, rgb) {
+            stamps.push({x: pageX, y: pageY, rgb: rgb});
+            renderSingleStamp(pageX, pageY, rgb);
+        }
+
+        // ================= 實用功能：筆尖漣漪回饋 =================
+        function createColorSplash(clientX, clientY, rgb) {
+            const splash = document.createElement('div');
+            splash.style.position = 'fixed';
+            splash.style.left = clientX + 'px';
+            splash.style.top = clientY + 'px';
+            splash.style.width = '20px';
+            splash.style.height = '20px';
+            splash.style.borderRadius = '50%';
+            splash.style.background = `rgba(${rgb}, 0.8)`;
+            splash.style.transform = 'translate(-50%, -50%) scale(1)';
+            splash.style.pointerEvents = 'none';
+            splash.style.zIndex = '999999';
+            splash.style.transition = 'all 0.4s ease-out';
+            document.body.appendChild(splash);
+
+            void splash.offsetWidth;
+
+            splash.style.transform = 'translate(-50%, -50%) scale(4)';
+            splash.style.opacity = '0';
+
+            setTimeout(() => splash.remove(), 400);
+        }
+
+        // ================= 1. 3D 滑鼠追蹤懸浮 (Tilt Effect) =================
+        const tiltCards = document.querySelectorAll('.tilt-card');
+        
+        tiltCards.forEach(card => {
+            card.addEventListener('mousemove', handleTilt);
+            card.addEventListener('mouseenter', handleMouseEnter);
+            card.addEventListener('mouseleave', handleMouseLeave);
+        });
+
+        function handleTilt(e) {
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const percentX = (x - centerX) / centerX;
+            const percentY = -(y - centerY) / centerY; 
+            const maxTilt = 10;
+            const rotateX = percentY * maxTilt;
+            const rotateY = percentX * maxTilt;
+            this.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`;
+        }
+        function handleMouseEnter() { this.style.transition = 'transform 0.1s ease-out'; }
+        function handleMouseLeave() {
+            this.style.transition = 'transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1)'; 
+            this.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+        }
+
+        // ================= 2. 首頁水墨進場 =================
         window.addEventListener('DOMContentLoaded', () => {
             const canvas = document.getElementById('ink-canvas');
             const ctx = canvas.getContext('2d');
@@ -379,6 +589,7 @@
                     let maxPossibleRadius = Math.hypot(canvas.width, canvas.height) * 0.65;
                     if (inkRipples[inkRipples.length - 1].r > maxPossibleRadius || allRipplesDone) {
                         canvas.style.opacity = '0'; canvas.style.pointerEvents = 'none';
+                        document.querySelector('.hero').classList.add('hero-loaded');
                         document.querySelectorAll('.hero .reveal').forEach(el => el.classList.add('active'));
                         setTimeout(() => { cancelAnimationFrame(animationId); canvas.style.display = 'none'; }, 1800);
                     } else { animationId = requestAnimationFrame(animate); }
@@ -387,7 +598,7 @@
             setTimeout(animate, 200);
         });
 
-        // ================= 2. 枯筆分岔與飛濺的細膩拖尾特效 =================
+        // ================= 3. 枯筆分岔與飛濺的細膩拖尾特效 =================
         const trailCanvas = document.getElementById('trail-canvas');
         const tCtx = trailCanvas.getContext('2d');
         let points = [];
@@ -403,59 +614,43 @@
             tCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
             let rgbColor = getComputedStyle(document.documentElement).getPropertyValue('--current-brush-color').trim();
 
-            tCtx.lineCap = 'round';
-            tCtx.lineJoin = 'round';
+            tCtx.lineCap = 'round'; tCtx.lineJoin = 'round';
 
-            points.forEach(p => p.age += 0.015); // 延長壽命讓拖尾更滑順
+            points.forEach(p => p.age += 0.015);
             points = points.filter(p => p.age < 1);
 
             for (let i = 1; i < points.length; i++) {
-                let p0 = points[i - 1];
-                let p1 = points[i];
-                let life = 1 - p1.age;
-
-                // 物理筆壓計算 (移動越快線越細)
+                let p0 = points[i - 1]; let p1 = points[i]; let life = 1 - p1.age;
                 let speed = Math.hypot(p1.x - p0.x, p1.y - p0.y);
                 let pressure = Math.max(0.5, 10 - speed * 0.1); 
 
-                // 主線條 (濃墨)
-                tCtx.beginPath();
-                tCtx.moveTo(p0.x, p0.y);
-                tCtx.lineTo(p1.x, p1.y);
+                tCtx.beginPath(); tCtx.moveTo(p0.x, p0.y); tCtx.lineTo(p1.x, p1.y);
                 tCtx.strokeStyle = `rgba(${rgbColor}, ${life * 0.4})`;
-                tCtx.lineWidth = pressure * life;
-                tCtx.stroke();
+                tCtx.lineWidth = pressure * life; tCtx.stroke();
 
-                // 副線條 (模擬筆刷分岔與毛細現象)
-                tCtx.beginPath();
-                tCtx.moveTo(p0.x + 3, p0.y + 3);
-                tCtx.lineTo(p1.x + 3, p1.y + 3);
+                tCtx.beginPath(); tCtx.moveTo(p0.x + 3, p0.y + 3); tCtx.lineTo(p1.x + 3, p1.y + 3);
                 tCtx.strokeStyle = `rgba(${rgbColor}, ${life * 0.15})`;
-                tCtx.lineWidth = (pressure * 0.4) * life;
-                tCtx.stroke();
+                tCtx.lineWidth = (pressure * 0.4) * life; tCtx.stroke();
 
-                // 枯筆飛濺墨滴 (當快速甩動滑鼠時觸發)
                 if (speed > 12 && Math.random() > 0.6) {
                     tCtx.beginPath();
-                    let offsetX = (Math.random() - 0.5) * 35;
-                    let offsetY = (Math.random() - 0.5) * 35;
+                    let offsetX = (Math.random() - 0.5) * 35; let offsetY = (Math.random() - 0.5) * 35;
                     tCtx.arc(p1.x + offsetX, p1.y + offsetY, Math.random() * 1.5, 0, Math.PI * 2);
-                    tCtx.fillStyle = `rgba(${rgbColor}, ${life * 0.3})`;
-                    tCtx.fill();
+                    tCtx.fillStyle = `rgba(${rgbColor}, ${life * 0.3})`; tCtx.fill();
                 }
             }
             requestAnimationFrame(animateTrail);
         }
         animateTrail();
 
-        // ================= 3. 關於我：視差浮水印滾動 =================
+        // ================= 4. 關於我：視差浮水印滾動 =================
         const watermark = document.getElementById('watermark');
         window.addEventListener('scroll', () => {
             let scrollPosition = window.scrollY;
             watermark.style.transform = `translate(-50%, ${scrollPosition * 0.25}px)`;
         });
 
-        // ================= 4. 畫廊切換潑墨動畫 & 階梯式進場 =================
+        // ================= 5. 調色盤切換潑墨動畫 =================
         const swatches = document.querySelectorAll('.paint-swatch');
         const galleryItems = document.querySelectorAll('.gallery-item');
         const wipeCanvas = document.getElementById('gallery-wipe-canvas');
@@ -464,13 +659,12 @@
 
         function resizeWipeCanvas() {
             const wrapper = document.querySelector('.gallery-wrapper');
-            wipeCanvas.width = wrapper.offsetWidth * 1.1; 
-            wipeCanvas.height = wrapper.offsetHeight * 1.1;
+            wipeCanvas.width = wrapper.offsetWidth * 1.1; wipeCanvas.height = wrapper.offsetHeight * 1.1;
         }
         window.addEventListener('resize', resizeWipeCanvas); resizeWipeCanvas();
 
         swatches.forEach(swatch => {
-            swatch.addEventListener('click', function() {
+            swatch.addEventListener('click', function(e) {
                 if (isFiltering || this.classList.contains('active')) return;
                 isFiltering = true;
 
@@ -480,34 +674,24 @@
                 const filter = this.getAttribute('data-filter');
                 const rgb = this.getAttribute('data-rgb');
                 
-                // 動態同步滑鼠拖尾顏色
                 document.documentElement.style.setProperty('--current-brush-color', rgb);
+                createColorSplash(e.clientX, e.clientY, rgb);
+                drawPermanentStamp(e.pageX, e.pageY, rgb);
 
                 resizeWipeCanvas();
-                let splashRadius = 0;
-                let maxRadius = Math.hypot(wipeCanvas.width, wipeCanvas.height);
-                let phase = 'splashIn'; 
-                let wipeAnimId;
-
-                galleryItems.forEach(item => {
-                    item.classList.remove('stagger-in');
-                    item.style.animationDelay = '0s';
-                });
+                let splashRadius = 0; let maxRadius = Math.hypot(wipeCanvas.width, wipeCanvas.height);
+                let phase = 'splashIn'; let wipeAnimId;
 
                 function animateWipe() {
                     wCtx.clearRect(0, 0, wipeCanvas.width, wipeCanvas.height);
 
                     if (phase === 'splashIn') {
                         splashRadius += 25; 
-                        
-                        wCtx.globalCompositeOperation = 'source-over';
-                        wCtx.fillStyle = `rgb(${rgb})`;
+                        wCtx.globalCompositeOperation = 'source-over'; wCtx.fillStyle = `rgb(${rgb})`;
                         wCtx.beginPath();
                         for (let i = 0; i <= Math.PI * 2; i += 0.1) {
-                            let noise = Math.sin(i * 10 + splashRadius*0.1) * 30;
-                            let r = splashRadius + noise;
-                            let x = wipeCanvas.width/2 + Math.cos(i) * r;
-                            let y = wipeCanvas.height/2 + Math.sin(i) * r;
+                            let noise = Math.sin(i * 10 + splashRadius*0.1) * 30; let r = splashRadius + noise;
+                            let x = wipeCanvas.width/2 + Math.cos(i) * r; let y = wipeCanvas.height/2 + Math.sin(i) * r;
                             if (i === 0) wCtx.moveTo(x, y); else wCtx.lineTo(x, y);
                         }
                         wCtx.fill();
@@ -518,36 +702,24 @@
                     } else if (phase === 'swap') {
                         let delayCounter = 0;
                         galleryItems.forEach(item => {
+                            item.style.transform = ''; 
                             if (filter === 'all' || item.getAttribute('data-category') === filter) {
-                                item.classList.remove('hide');
-                                item.classList.add('stagger-in');
-                                item.style.animationDelay = `${delayCounter * 0.08}s`; 
+                                item.classList.remove('hide'); item.classList.add('stagger-in');
+                                let delayTime = delayCounter * 0.08; item.style.animationDelay = `${delayTime}s`; 
+                                setTimeout(() => { item.classList.remove('stagger-in'); item.style.animationDelay = '0s'; }, (delayTime + 0.6) * 1000 + 50);
                                 delayCounter++;
-                            } else {
-                                item.classList.add('hide');
-                            }
+                            } else { item.classList.add('hide'); }
                         });
-
-                        setTimeout(() => {
-                            phase = 'splashOut';
-                            splashRadius = 0; 
-                            wipeAnimId = requestAnimationFrame(animateWipe);
-                        }, 50);
+                        setTimeout(() => { phase = 'splashOut'; splashRadius = 0; wipeAnimId = requestAnimationFrame(animateWipe); }, 50);
 
                     } else if (phase === 'splashOut') {
                         splashRadius += 30; 
-                        
-                        wCtx.globalCompositeOperation = 'source-over';
-                        wCtx.fillStyle = `rgb(${rgb})`;
-                        wCtx.fillRect(0, 0, wipeCanvas.width, wipeCanvas.height);
-
+                        wCtx.globalCompositeOperation = 'source-over'; wCtx.fillStyle = `rgb(${rgb})`; wCtx.fillRect(0, 0, wipeCanvas.width, wipeCanvas.height);
                         wCtx.globalCompositeOperation = 'destination-out';
                         wCtx.beginPath();
                         for (let i = 0; i <= Math.PI * 2; i += 0.1) {
-                            let noise = Math.sin(i * 8 - splashRadius*0.1) * 40;
-                            let r = splashRadius + noise;
-                            let x = wipeCanvas.width/2 + Math.cos(i) * r;
-                            let y = wipeCanvas.height/2 + Math.sin(i) * r;
+                            let noise = Math.sin(i * 8 - splashRadius*0.1) * 40; let r = splashRadius + noise;
+                            let x = wipeCanvas.width/2 + Math.cos(i) * r; let y = wipeCanvas.height/2 + Math.sin(i) * r;
                             if (i === 0) wCtx.moveTo(x, y); else wCtx.lineTo(x, y);
                         }
                         wCtx.fill();
@@ -556,16 +728,82 @@
                             wCtx.clearRect(0, 0, wipeCanvas.width, wipeCanvas.height);
                             cancelAnimationFrame(wipeAnimId);
                             setTimeout(() => { isFiltering = false; }, 500); 
-                        } else {
-                            wipeAnimId = requestAnimationFrame(animateWipe);
-                        }
+                        } else { wipeAnimId = requestAnimationFrame(animateWipe); }
                     }
                 }
                 animateWipe();
             });
         });
 
-        // ================= 滾動與燈箱邏輯 =================
+        // ================= 6. 全域智慧點擊吸色引擎 (含永久印記) =================
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        document.addEventListener('click', function(e) {
+            if (e.target.id === 'lightbox' || e.target.classList.contains('lightbox-close')) {
+                lightbox.classList.remove('active'); return;
+            }
+            if (e.target.closest('.paint-swatch')) return;
+
+            let el = e.target;
+            let rgb = '59, 58, 54'; 
+
+            if (el.tagName.toLowerCase() === 'img') {
+                if (el.closest('.gallery-item')) {
+                    lightboxImg.src = el.src; lightbox.classList.add('active'); 
+                }
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 1; canvas.height = 1;
+                    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                    const rect = el.getBoundingClientRect();
+                    const px = ((e.clientX - rect.left) / rect.width) * el.naturalWidth;
+                    const py = ((e.clientY - rect.top) / rect.height) * el.naturalHeight;
+                    
+                    ctx.drawImage(el, px, py, 1, 1, 0, 0, 1, 1);
+                    const data = ctx.getImageData(0, 0, 1, 1).data;
+                    if (data[3] === 0) throw new Error("Transparent");
+                    rgb = `${data[0]}, ${data[1]}, ${data[2]}`;
+                } catch (err) {
+                    const galleryItem = el.closest('.gallery-item');
+                    if (galleryItem) {
+                        const cat = galleryItem.getAttribute('data-category');
+                        if (cat === 'sketch') rgb = '158, 161, 163';
+                        else if (cat === 'digital') rgb = '107, 140, 206';
+                        else if (cat === 'hand') rgb = '212, 122, 126';
+                    }
+                }
+            } 
+            else if (el.closest('.hero-signature') || el.closest('.btn-cta') || el.closest('h3') || el.closest('.parallax-watermark')) {
+                rgb = '197, 160, 89'; 
+            } 
+            else {
+                let targetEl = el; let foundColor = false;
+                while (targetEl && targetEl !== document.documentElement) {
+                    const styles = window.getComputedStyle(targetEl);
+                    if (['h1', 'h2', 'p', 'span', 'a', 'li'].includes(targetEl.tagName.toLowerCase())) {
+                        const color = styles.color; const match = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+                        if (match && (match[1] !== '0' || match[2] !== '0' || match[3] !== '0')) { 
+                            rgb = `${match[1]}, ${match[2]}, ${match[3]}`; foundColor = true; break;
+                        }
+                    }
+                    const bg = styles.backgroundColor; const bgMatch = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([0-9.]+))?\)/);
+                    if (bgMatch && parseFloat(bgMatch[4] !== undefined ? bgMatch[4] : 1) > 0.1) {
+                        rgb = `${bgMatch[1]}, ${bgMatch[2]}, ${bgMatch[3]}`; foundColor = true; break;
+                    }
+                    targetEl = targetEl.parentElement;
+                }
+                if (!foundColor) { rgb = '253, 251, 247'; }
+            }
+
+            document.documentElement.style.setProperty('--current-brush-color', rgb);
+            createColorSplash(e.clientX, e.clientY, rgb);
+            
+            // 🌟 將吸取到的顏色，以水彩印記永遠畫在網頁底層畫布上
+            drawPermanentStamp(e.pageX, e.pageY, rgb);
+        });
+
+        // ================= 滾動邏輯 =================
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) { entry.target.classList.add('active'); observer.unobserve(entry.target); }
@@ -573,14 +811,6 @@
         }, { threshold: 0.1 });
         document.querySelectorAll('.container .reveal').forEach(el => observer.observe(el));
 
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightbox-img');
-        const galleryImages = document.querySelectorAll('.gallery-item img');
-        
-        galleryImages.forEach(img => {
-            img.addEventListener('click', function () { lightboxImg.src = this.src; lightbox.classList.add('active'); });
-        });
-        lightbox.addEventListener('click', function (e) { if (e.target !== lightboxImg) this.classList.remove('active'); });
     </script>
 </body>
 
