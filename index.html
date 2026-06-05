@@ -6,8 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>doyoda | Illustration Portfolio</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" href="/icon/image.ico" type="image/x-icon" />
-    <link rel="shortcut icon" href="icon/image.ico" type="image/x-icon" />
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Noto+Sans+TC:wght@300;500;700;900&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
     <style>
         /* ================= 變數設定區 ================= */
@@ -19,12 +17,17 @@
             --white: #ffffff;
             --transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
             --current-brush-color: 28, 28, 28;
+            /* 💡 墨水系統變數 */
+            --ink-level: 100%;
         }
 
         /* ================= 水彩筆游標 ================= */
-        html, body, a, .paint-swatch, .btn-cta, .gallery-item img, .bg-webp-splatter {
+        html, body, a, .paint-swatch, .btn-cta, .gallery-item img, .bg-webp-splatter, .wash-btn {
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g transform="rotate(45 16 16)"><path d="M16 2 C18 2, 20 5, 20 20 L12 20 C12 5, 14 2, 16 2 Z" fill="%236b8cce"/><rect x="12" y="20" width="8" height="4" fill="%23cccccc"/><path d="M12 24 C12 28, 15 32, 16 32 C17 32, 20 28, 20 24 Z" fill="%23c5a059"/><path d="M14 24 L14 29 M18 24 L18 29 M16 24 L16 31" stroke="%238a6a32" stroke-width="0.5" fill="none"/></g></svg>') 5 27, auto !important;
         }
+        
+        /* 枯筆狀態的游標提示 */
+        
 
         html { scroll-behavior: smooth; }
         * { box-sizing: border-box; }
@@ -39,6 +42,7 @@
             user-select: none;
         }
 
+        /* 點陣和紙背景層 */
         .bg-texture {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: #fdfbf7;
@@ -46,23 +50,37 @@
                 radial-gradient(rgba(197, 160, 89, 0.15) 1.5px, transparent 1.5px),
                 linear-gradient(135deg, #ffffff 0%, #fdf9f1 100%);
             background-size: 25px 25px, 100% 100%;
-            z-index: -4; pointer-events: none;
+            z-index: -5; pointer-events: none;
+        }
+
+        /* ================= 🌟 環境光影紙紋引擎 (Normal Map Lighting) ================= */
+        .paper-lighting {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: -2; /* 提高層級，覆蓋在底色與光暈之上 */
+            /* 強化 SVG 高階粗糙水彩紙雜訊 */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.5'/%3E%3C/svg%3E");
+            background-color: rgba(30, 20, 10, 0.08); /* 微微暖色壓暗 */
+            mix-blend-mode: color-burn; /* 色彩增值帶來強烈紙張對比 */
+            /* 擴大聚光燈半徑，且外圍保留 10% 亮度 */
+            mask-image: radial-gradient(circle 600px at var(--mouse-x, 50vw) var(--mouse-y, 50vh), rgba(0,0,0,1) 0%, rgba(0,0,0,0.1) 100%);
+            -webkit-mask-image: radial-gradient(circle 600px at var(--mouse-x, 50vw) var(--mouse-y, 50vh), rgba(0,0,0,1) 0%, rgba(0,0,0,0.1) 100%);
+            opacity: 0.85; /* 提高整體紋理能見度 */
+            will-change: mask-position, -webkit-mask-position;
         }
 
         .container, .hero { position: relative; z-index: 2; }
 
         /* ================= 1. 四重水彩暈染背景 ================= */
         .ambient-blobs { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; pointer-events: none; z-index: -3; mix-blend-mode: multiply; }
-        /* 🚀 效能優化：為背景光暈開啟 GPU 加速 */
-        .blob-1 { position: absolute; top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(197,160,89,0.25), transparent 60%); filter: blur(60px); animation: float1 18s infinite alternate ease-in-out; will-change: transform; transform: translateZ(0); }
-        .blob-2 { position: absolute; bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(107,140,206,0.2), transparent 60%); filter: blur(60px); animation: float2 22s infinite alternate-reverse ease-in-out; will-change: transform; transform: translateZ(0); }
-        .blob-3 { position: absolute; top: 30%; right: -10%; width: 45vw; height: 45vw; background: radial-gradient(circle, rgba(212,122,126,0.2), transparent 60%); filter: blur(60px); animation: float3 25s infinite alternate ease-in-out; will-change: transform; transform: translateZ(0); }
-        .blob-4 { position: absolute; bottom: 20%; left: -15%; width: 55vw; height: 55vw; background: radial-gradient(circle, rgba(130,201,166,0.2), transparent 60%); filter: blur(60px); animation: float4 20s infinite alternate-reverse ease-in-out; will-change: transform; transform: translateZ(0); }
+        .blob-1 { position: absolute; top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(197,160,89,0.25), transparent 60%); filter: blur(60px); animation: float1 18s infinite alternate ease-in-out; }
+        .blob-2 { position: absolute; bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(107,140,206,0.2), transparent 60%); filter: blur(60px); animation: float2 22s infinite alternate-reverse ease-in-out; }
+        .blob-3 { position: absolute; top: 30%; right: -10%; width: 45vw; height: 45vw; background: radial-gradient(circle, rgba(212,122,126,0.2), transparent 60%); filter: blur(60px); animation: float3 25s infinite alternate ease-in-out; }
+        .blob-4 { position: absolute; bottom: 20%; left: -15%; width: 55vw; height: 55vw; background: radial-gradient(circle, rgba(130,201,166,0.2), transparent 60%); filter: blur(60px); animation: float4 20s infinite alternate-reverse ease-in-out; }
         
-        @keyframes float1 { to { transform: translate3d(10vw, 10vh, 0) scale(1.15); } }
-        @keyframes float2 { to { transform: translate3d(-10vw, -10vh, 0) scale(0.9); } }
-        @keyframes float3 { to { transform: translate3d(-15vw, -5vh, 0) scale(1.1); } }
-        @keyframes float4 { to { transform: translate3d(15vw, 15vh, 0) scale(0.95); } }
+        @keyframes float1 { to { transform: translate(10vw, 10vh) scale(1.15); } }
+        @keyframes float2 { to { transform: translate(-10vw, -10vh) scale(0.9); } }
+        @keyframes float3 { to { transform: translate(-15vw, -5vh) scale(1.1); } }
+        @keyframes float4 { to { transform: translate(15vw, 15vh) scale(0.95); } }
 
         /* ================= 2. WebP 顏料包容器與樣式 ================= */
         #splatter-container {
@@ -74,16 +92,13 @@
             position: absolute;
             pointer-events: auto; 
             transform-origin: center;
-            /* 🚀 效能優化：使用 translate3d 與 will-change 強制獨立顯示卡圖層渲染，解決混色卡頓 */
-            transform: translate3d(-50%, -50%, 0) rotate(var(--rot)) scale(1);
+            transform: translate(-50%, -50%) rotate(var(--rot)) scale(1);
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s;
             mix-blend-mode: multiply;
             opacity: 0.85; 
-            will-change: transform, filter;
-            -webkit-backface-visibility: hidden;
         }
         .bg-webp-splatter:hover {
-            transform: translate3d(-50%, -50%, 0) rotate(var(--rot)) scale(1.15);
+            transform: translate(-50%, -50%) rotate(var(--rot)) scale(1.15);
             filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2));
             z-index: 10;
         }
@@ -99,12 +114,73 @@
             pointer-events: none;
             mix-blend-mode: multiply;
             animation: stampPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            will-change: transform, opacity;
         }
         @keyframes stampPop {
-            0% { transform: translate3d(-50%, -50%, 0) scale(0.1); opacity: 0; }
+            0% { transform: translate(-50%, -50%) scale(0.1); opacity: 0; }
             40% { opacity: 1; }
-            100% { transform: translate3d(-50%, -50%, 0) scale(1); opacity: 0.85; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.85; }
+        }
+
+        /* ================= 🌟 水彩滴落重力特效 (Gravity Ink Drips) 優化版 ================= */
+        .ink-drip {
+            position: absolute; pointer-events: none; z-index: 0; mix-blend-mode: multiply;
+            border-radius: 5px; transform-origin: top center;
+            animation: dripDown ease-out forwards;
+        }
+        @keyframes dripDown {
+            0% { height: 0; opacity: 1; }
+            50% { opacity: 0.85; }
+            /* 100% 不消失，而是留下半透明的乾涸水漬！ */
+            100% { height: var(--drip-length); opacity: 0.3; } 
+        }
+
+        /* ================= 💡 動態墨水量表 UI (Dynamic Ink Gauge) ================= */
+        .ink-gauge-wrapper {
+            position: fixed; right: 35px; top: 50%; transform: translateY(-50%);
+            width: 14px; height: 200px; 
+            background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 2px solid rgba(197, 160, 89, 0.4); border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1), inset 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 99990; pointer-events: none; overflow: hidden;
+        }
+        .ink-gauge-fill {
+            position: absolute; bottom: 0; left: 0; width: 100%; 
+            height: var(--ink-level); 
+            background: rgb(var(--current-brush-color)); 
+            transition: background-color 0.4s ease, height 0.1s linear;
+        }
+        .ink-gauge-alert {
+            position: fixed; right: 65px; top: 50%; transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9); color: var(--accent);
+            padding: 8px 15px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid var(--accent);
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        html.out-of-ink .ink-gauge-alert { opacity: 1; animation: pulseAlert 1s infinite alternate; }
+        @keyframes pulseAlert { to { transform: translateY(-50%) scale(1.05); } }
+
+        /* ================= 洗筆水幕與按鈕 ================= */
+        .wash-btn {
+            position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px;
+            background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(197, 160, 89, 0.4); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; color: var(--accent); z-index: 99990; pointer-events: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08), inset 0 0 15px rgba(255,255,255,0.6);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .wash-btn:hover {
+            transform: translateY(-8px) scale(1.1); background: var(--accent); color: #fff;
+            box-shadow: 0 15px 35px rgba(197, 160, 89, 0.3); border-color: transparent;
+        }
+        .water-wave {
+            position: fixed; top: -150vh; left: 0; width: 100vw; height: 150vh;
+            background: linear-gradient(to bottom, rgba(253,251,247,0) 0%, rgba(107, 140, 206, 0.15) 50%, rgba(107, 140, 206, 0.4) 100%);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            z-index: 99998; pointer-events: none; border-radius: 0 0 50% 50% / 0 0 150px 150px; will-change: transform;
+        }
+        .water-wave.washing {
+            transition: transform 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95); transform: translate3d(0, 260vh, 0);
         }
 
         /* Canvas 畫布群 */
@@ -157,12 +233,12 @@
         .section-title { text-align: center; font-size: 2rem; letter-spacing: 10px; text-indent: 10px; margin-bottom: 70px; position: relative; font-weight: 900; color: var(--text-dark); z-index: 2; }
         .section-title::after { content: ""; width: 40px; height: 2px; background: var(--accent); position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); }
 
-        /* ================= 關於我：視差浮水印 ================= */
+        /* ================= 關於我 ================= */
         #about { overflow: hidden; }
         .parallax-watermark { position: absolute; top: 20%; left: 50%; transform: translate(-50%, 0); font-family: 'Noto Serif TC', serif; font-weight: 900; font-size: 25rem; color: rgba(197, 160, 89, 0.05); pointer-events: none; white-space: nowrap; z-index: 0; line-height: 1; user-select: none; }
         .about-content { position: relative; z-index: 2; }
 
-        /* ================= 3D 懸浮追蹤卡片 ================= */
+        /* ================= 3D 懸浮卡片 ================= */
         .tilt-card { position: relative; transform-style: preserve-3d; }
 
         /* ================= 技能區塊 ================= */
@@ -173,13 +249,13 @@
         .skill-tags span { padding: 8px 20px; background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.06); border-radius: 50px; font-size: 0.9rem; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); transition: var(--transition); }
         .skill-tags span:hover { border-color: var(--accent); transform: translateY(-3px) scale(1.05); color: var(--accent); box-shadow: 0 10px 25px rgba(197, 160, 89, 0.15); }
 
-        /* ================= 左右並排佈局 ================= */
+        /* ================= 左右佈局 ================= */
         .portfolio-layout { display: flex; gap: 80px; align-items: flex-start; }
         .gallery-wrapper { flex: 1; min-width: 0; position: relative; min-height: 600px; }
         #gallery-wipe-canvas { position: absolute; top: -5%; left: -5%; width: 110%; height: 110%; pointer-events: none; z-index: 50; }
         .palette-sidebar { width: 440px; flex-shrink: 0; position: sticky; top: 140px; display: flex; justify-content: flex-end; margin-left: 20px; }
 
-        /* ================= 平面木頭調色盤 ================= */
+        /* ================= 調色盤 ================= */
         .flat-palette { position: relative; width: 430px; height: 340px; transform: rotate(-6deg); z-index: 10; }
         .palette-board {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #d0ad7f; border-radius: 45% 55% 50% 50% / 50% 50% 55% 45%;
@@ -207,22 +283,14 @@
 
         /* ================= 瀑布流畫廊 ================= */
         .gallery { column-count: 3; column-gap: 20px; width: 100%; }
-        .gallery-item { 
-            display: inline-block; width: 100%; margin-bottom: 20px; 
-            position: relative; border-radius: 16px; overflow: hidden; 
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); background: #fff; 
-            /* 🚀 效能優化：強制顯示卡渲染，防瀑布流斷行錯位 */
-            opacity: 1; transform: translate3d(0, 0, 0) scale(1); 
-            will-change: transform, opacity;
-            break-inside: avoid; -webkit-column-break-inside: avoid;
-        }
+        .gallery-item { display: inline-block; width: 100%; margin-bottom: 20px; position: relative; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); background: #fff; opacity: 1; transform: translateY(0) scale(1); }
         .gallery-item img { width: 100%; height: auto; display: block; transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); }
         .gallery-item:hover { box-shadow: 0 25px 50px rgba(197, 160, 89, 0.25); z-index: 5; }
         .gallery-item:hover img { transform: scale(1.08); }
         .gallery-item.hide { display: none !important; }
         
-        .gallery-item.stagger-in { animation: staggerPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; transform: translate3d(0, 40px, 0) scale(0.9); }
-        @keyframes staggerPop { to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); } }
+        .gallery-item.stagger-in { animation: staggerPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; transform: translateY(40px) scale(0.9); }
+        @keyframes staggerPop { to { opacity: 1; transform: translateY(0) scale(1); } }
 
         /* ================= Lightbox ================= */
         .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.92); display: flex; justify-content: center; align-items: center; z-index: 20000; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
@@ -235,6 +303,7 @@
 </head>
 
 <body>
+    <div class="paper-lighting"></div>
     <div class="bg-texture"></div>
 
     <div class="ambient-blobs">
@@ -247,6 +316,16 @@
     <div id="splatter-container"></div>
     
     <div id="stamp-container"></div>
+
+    <div class="ink-gauge-wrapper" title="當前墨水量 (Ink Level)">
+        <div class="ink-gauge-fill" id="ink-gauge-fill"></div>
+    </div>
+    <div class="ink-gauge-alert" id="ink-gauge-alert">墨水耗盡，請沾取顏料</div>
+
+    <div id="water-wave" class="water-wave"></div>
+    <div id="wash-btn" class="wash-btn" title="清洗畫布並重新沾墨 (Wash Canvas & Refill Ink)">
+        <i class="fas fa-tint"></i>
+    </div>
 
     <canvas id="ink-canvas"></canvas>
     <canvas id="trail-canvas"></canvas>
@@ -343,28 +422,28 @@
                     <canvas id="gallery-wipe-canvas"></canvas>
 
                     <div class="gallery">
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art1.webp" alt="手繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art2.webp" alt="手繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art3.webp" alt="手繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art4.webp" alt="手繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art5.webp" alt="手繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art6.webp" alt="手繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art7.webp" alt="手繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art8.webp" alt="手繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art9.webp" alt="手繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art1.webp" alt="電繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art2.webp" alt="電繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art3.webp" alt="電繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art4.webp" alt="電繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art5.webp" alt="電繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art6.webp" alt="電繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art7.webp" alt="電繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art8.webp" alt="電繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art9.webp" alt="電繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art10.webp" alt="電繪" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art11.webp" alt="電繪" loading="lazy" decoding="async"></div>                          
-                        <div class="gallery-item tilt-card" data-category="sketch"><img src="sketch/s_art1.webp" alt="素描" loading="lazy" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="sketch"><img src="sketch/s_art2.webp" alt="素描" loading="lazy" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art1.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art2.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art3.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art4.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art5.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art6.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art7.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art8.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art9.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art1.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art2.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art3.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art4.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art5.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art6.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art7.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art8.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art9.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art10.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art11.webp" alt="電繪" decoding="async"></div>                          
+                        <div class="gallery-item tilt-card" data-category="sketch"><img src="sketch/s_art1.webp" alt="素描" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="sketch"><img src="sketch/s_art2.webp" alt="素描" decoding="async"></div>
                     </div>
                 </div>
 
@@ -425,7 +504,32 @@
     </div>
 
     <script>
-        // ================= 💡 WebP 顏料包散落引擎與防碰撞演算法 =================
+        // ================= 💡 追蹤滑鼠位置，供光影紙紋遮罩使用 =================
+        window.addEventListener('mousemove', e => {
+            document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
+            document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
+        }, { passive: true });
+
+        // ================= 墨水消耗與沾水微遊戲機制 (Dynamic Ink Engine) =================
+        let currentInkLevel = 100;
+        const htmlRoot = document.documentElement;
+
+        function updateInkLevel(amount) {
+            currentInkLevel = Math.max(0, Math.min(100, currentInkLevel + amount));
+            htmlRoot.style.setProperty('--ink-level', `${currentInkLevel}%`);
+            
+            if (currentInkLevel <= 0) {
+                htmlRoot.classList.add('out-of-ink');
+            } else {
+                htmlRoot.classList.remove('out-of-ink');
+            }
+        }
+        
+        // 提供外部呼叫，沾取滿墨水
+        function refillInk() { updateInkLevel(100); }
+
+
+        // ================= WebP 顏料包散落引擎與防碰撞演算法 =================
         const splatterContainer = document.getElementById('splatter-container');
 
         function getAvoidRects() {
@@ -548,10 +652,14 @@
         
         window.addEventListener('load', spawnWebpSplatters);
 
-        // ================= 💦 畫布作畫的彈跳動畫印記 (Stamp Animation) =================
+        // ================= 🎨 畫布作畫動畫印記 ＋ 🌟 極致水彩重力滴落 =================
         const stampContainer = document.getElementById('stamp-container');
 
+        // 💡 移除 Flatten，徹底解決印記消失問題，保留最穩定的 DOM 作畫
         function drawPermanentStamp(pageX, pageY, rgb) {
+            // 枯筆判斷：沒墨水就不准畫！
+            if (currentInkLevel <= 0) return;
+
             const stampDom = document.createElement('canvas');
             const size = Math.random() * 80 + 100; 
             stampDom.width = 200;
@@ -569,13 +677,16 @@
             ctx.rotate(Math.random() * Math.PI * 2);
             ctx.translate(-cx, -cy);
 
+            // 計算當前墨水濃淡度 (Ink Opacity Factor)
+            const inkFactor = Math.max(0.1, currentInkLevel / 100);
+
             let baseRadius = Math.random() * 30 + 30; 
             for(let i=0; i<8; i++) {
                 ctx.beginPath();
                 let offsetX = (Math.random() - 0.5) * baseRadius;
                 let offsetY = (Math.random() - 0.5) * baseRadius;
                 ctx.arc(cx + offsetX, cy + offsetY, baseRadius * (Math.random() * 0.6 + 0.4), 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${rgb}, ${Math.random() * 0.04 + 0.01})`;
+                ctx.fillStyle = `rgba(${rgb}, ${(Math.random() * 0.04 + 0.01) * inkFactor})`; 
                 ctx.fill();
             }
             
@@ -584,12 +695,67 @@
                 let pX = cx + (Math.random() - 0.5) * 80;
                 let pY = cy + (Math.random() - 0.5) * 80;
                 ctx.arc(pX, pY, Math.random() * 3 + 1, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${rgb}, ${Math.random() * 0.15 + 0.05})`;
+                ctx.fillStyle = `rgba(${rgb}, ${(Math.random() * 0.15 + 0.05) * inkFactor})`;
                 ctx.fill();
             }
 
             stampContainer.appendChild(stampDom);
+            
+            // 🌟 物理滴落邏輯優化：
+            // 只要墨水大於 10%，就有 70% 很高機率會流下顏料！
+            if (inkFactor > 0.1 && Math.random() > 0.3) {
+                const dripCount = Math.floor(Math.random() * 3) + 2; // 產生 2~4 條滴痕
+                for(let d = 0; d < dripCount; d++) {
+                    const drip = document.createElement('div');
+                    const dripWidth = Math.random() * 4 + 2.5; // 寬度加粗：2.5px - 6.5px
+                    const dripLength = Math.random() * 200 + 100; // 滴流加長：100px - 300px
+                    const dripDuration = Math.random() * 3 + 2; // 緩慢流下：2s - 5s
+                    
+                    drip.className = 'ink-drip';
+                    drip.style.width = `${dripWidth}px`;
+                    drip.style.left = `${pageX + (Math.random() - 0.5) * (size * 0.6)}px`;
+                    drip.style.top = `${pageY + (Math.random() * size * 0.2)}px`;
+                    
+                    drip.style.setProperty('--drip-length', `${dripLength}px`);
+                    drip.style.animationDuration = `${dripDuration}s`;
+                    drip.style.background = `linear-gradient(to bottom, rgba(${rgb}, ${0.9 * inkFactor}), rgba(${rgb}, 0))`;
+                    
+                    stampContainer.appendChild(drip);
+                }
+            }
+
+            // 💡 提升墨水續航力：蓋一次印記僅扣除 5 點墨水
+            updateInkLevel(-5);
         }
+
+        // ================= 洗筆水幕與按鈕 =================
+        const washBtn = document.getElementById('wash-btn');
+        const waterWave = document.getElementById('water-wave');
+
+        washBtn.addEventListener('click', () => {
+            if(waterWave.classList.contains('washing')) return; 
+
+            waterWave.style.transition = 'transform 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95)';
+            waterWave.classList.add('washing');
+            
+            // 洗筆順便把墨水補滿！
+            refillInk();
+
+            setTimeout(() => {
+                // 清空所有的 DOM 水墨印記與滴痕
+                stampContainer.innerHTML = '';
+                
+                const trailCanvas = document.getElementById('trail-canvas');
+                const tCtx = trailCanvas.getContext('2d');
+                tCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+                points = []; 
+            }, 600);
+
+            setTimeout(() => {
+                waterWave.style.transition = 'none'; 
+                waterWave.classList.remove('washing'); 
+            }, 1600);
+        });
 
         // ================= 實用功能：吸色時的筆尖短暫漣漪 =================
         function createColorSplash(clientX, clientY, rgb) {
@@ -706,16 +872,23 @@
             setTimeout(animate, 200);
         });
 
-        // ================= 3. 枯筆分岔與飛濺的細膩拖尾特效 (🚀 節流優化) =================
+        // ================= 3. 枯筆分岔與飛濺的細膩拖尾特效 (結合消耗機制) =================
         const trailCanvas = document.getElementById('trail-canvas');
         const tCtx = trailCanvas.getContext('2d');
         let points = [];
+        let lastMousePos = { x: null, y: null };
         
         function resizeTrail() { trailCanvas.width = window.innerWidth; trailCanvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeTrail); resizeTrail();
 
-        // 🚀 效能優化：使用 passive: true 降低事件負載
         window.addEventListener('mousemove', e => {
+            // 💡 提升墨水續航力：移動所消耗的墨水大幅減少 (0.015 -> 0.003)
+            if (lastMousePos.x !== null) {
+                let dist = Math.hypot(e.clientX - lastMousePos.x, e.clientY - lastMousePos.y);
+                if (dist > 0) updateInkLevel(-dist * 0.003); 
+            }
+            lastMousePos = { x: e.clientX, y: e.clientY };
+
             points.push({ x: e.clientX, y: e.clientY, age: 0 });
         }, { passive: true });
 
@@ -728,45 +901,41 @@
             points.forEach(p => p.age += 0.015);
             points = points.filter(p => p.age < 1);
 
-            for (let i = 1; i < points.length; i++) {
-                let p0 = points[i - 1]; let p1 = points[i]; let life = 1 - p1.age;
-                let speed = Math.hypot(p1.x - p0.x, p1.y - p0.y);
-                let pressure = Math.max(0.5, 10 - speed * 0.1); 
+            // 計算全域拖尾墨水濃度
+            const inkFactor = Math.max(0, currentInkLevel / 100);
 
-                tCtx.beginPath(); tCtx.moveTo(p0.x, p0.y); tCtx.lineTo(p1.x, p1.y);
-                tCtx.strokeStyle = `rgba(${rgbColor}, ${life * 0.4})`;
-                tCtx.lineWidth = pressure * life; tCtx.stroke();
+            if (inkFactor > 0) {
+                for (let i = 1; i < points.length; i++) {
+                    let p0 = points[i - 1]; let p1 = points[i]; let life = 1 - p1.age;
+                    let speed = Math.hypot(p1.x - p0.x, p1.y - p0.y);
+                    let pressure = Math.max(0.5, 10 - speed * 0.1); 
 
-                tCtx.beginPath(); tCtx.moveTo(p0.x + 3, p0.y + 3); tCtx.lineTo(p1.x + 3, p1.y + 3);
-                tCtx.strokeStyle = `rgba(${rgbColor}, ${life * 0.15})`;
-                tCtx.lineWidth = (pressure * 0.4) * life; tCtx.stroke();
+                    tCtx.beginPath(); tCtx.moveTo(p0.x, p0.y); tCtx.lineTo(p1.x, p1.y);
+                    tCtx.strokeStyle = `rgba(${rgbColor}, ${life * 0.4 * inkFactor})`; // 套用枯筆透明度
+                    tCtx.lineWidth = pressure * life; tCtx.stroke();
 
-                if (speed > 12 && Math.random() > 0.6) {
-                    tCtx.beginPath();
-                    let offsetX = (Math.random() - 0.5) * 35; let offsetY = (Math.random() - 0.5) * 35;
-                    tCtx.arc(p1.x + offsetX, p1.y + offsetY, Math.random() * 1.5, 0, Math.PI * 2);
-                    tCtx.fillStyle = `rgba(${rgbColor}, ${life * 0.3})`; tCtx.fill();
+                    tCtx.beginPath(); tCtx.moveTo(p0.x + 3, p0.y + 3); tCtx.lineTo(p1.x + 3, p1.y + 3);
+                    tCtx.strokeStyle = `rgba(${rgbColor}, ${life * 0.15 * inkFactor})`;
+                    tCtx.lineWidth = (pressure * 0.4) * life; tCtx.stroke();
+
+                    if (speed > 12 && Math.random() > 0.6) {
+                        tCtx.beginPath();
+                        let offsetX = (Math.random() - 0.5) * 35; let offsetY = (Math.random() - 0.5) * 35;
+                        tCtx.arc(p1.x + offsetX, p1.y + offsetY, Math.random() * 1.5, 0, Math.PI * 2);
+                        tCtx.fillStyle = `rgba(${rgbColor}, ${life * 0.3 * inkFactor})`; tCtx.fill();
+                    }
                 }
             }
             requestAnimationFrame(animateTrail);
         }
         animateTrail();
 
-        // ================= 4. 關於我：視差浮水印滾動 (🚀 節流優化) =================
+        // ================= 4. 關於我：視差浮水印滾動 =================
         const watermark = document.getElementById('watermark');
-        let isWatermarkScrolling = false;
-        
-        // 🚀 效能優化：把滾動事件包裝進 requestAnimationFrame，避免掉幀卡頓
         window.addEventListener('scroll', () => {
-            if (!isWatermarkScrolling) {
-                window.requestAnimationFrame(() => {
-                    let scrollPosition = window.scrollY;
-                    watermark.style.transform = `translate3d(-50%, ${scrollPosition * 0.25}px, 0)`;
-                    isWatermarkScrolling = false;
-                });
-                isWatermarkScrolling = true;
-            }
-        }, { passive: true });
+            let scrollPosition = window.scrollY;
+            watermark.style.transform = `translate(-50%, ${scrollPosition * 0.25}px)`;
+        });
 
         // ================= 5. 調色盤切換潑墨動畫 =================
         const swatches = document.querySelectorAll('.paint-swatch');
@@ -783,6 +952,9 @@
 
         swatches.forEach(swatch => {
             swatch.addEventListener('click', function(e) {
+                // 💡 點擊調色盤也算重新沾墨！
+                refillInk();
+
                 if (isFiltering || this.classList.contains('active')) return;
                 isFiltering = true;
 
@@ -857,9 +1029,11 @@
         const lightboxImg = document.getElementById('lightbox-img');
 
         document.addEventListener('click', function(e) {
+            // 排除 Lightbox 點擊
             if (e.target.id === 'lightbox' || e.target.classList.contains('lightbox-close')) {
                 lightbox.classList.remove('active'); return;
             }
+            // 排除調色盤
             if (e.target.closest('.paint-swatch')) return;
 
             let el = e.target;
@@ -907,6 +1081,8 @@
             }
             
             if (isColorPicked) {
+                // 💡 吸色等於沾墨！
+                refillInk();
                 document.documentElement.style.setProperty('--current-brush-color', pickedRGB);
                 createColorSplash(e.clientX, e.clientY, pickedRGB);
             } else {
