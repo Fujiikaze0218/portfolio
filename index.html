@@ -22,12 +22,14 @@
         }
 
         /* ================= 水彩筆游標 ================= */
-        html, body, a, .paint-swatch, .btn-cta, .gallery-item img, .bg-webp-splatter, .wash-btn {
+        html, body, a, .paint-swatch, .btn-cta, .gallery-item img, .bg-webp-splatter, .wash-btn, .step-btn, .view-process-btn {
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g transform="rotate(45 16 16)"><path d="M16 2 C18 2, 20 5, 20 20 L12 20 C12 5, 14 2, 16 2 Z" fill="%236b8cce"/><rect x="12" y="20" width="8" height="4" fill="%23cccccc"/><path d="M12 24 C12 28, 15 32, 16 32 C17 32, 20 28, 20 24 Z" fill="%23c5a059"/><path d="M14 24 L14 29 M18 24 L18 29 M16 24 L16 31" stroke="%238a6a32" stroke-width="0.5" fill="none"/></g></svg>') 5 27, auto !important;
         }
         
         /* 枯筆狀態的游標提示 */
-        
+        html.out-of-ink, html.out-of-ink * {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g transform="rotate(45 16 16)"><path d="M16 2 C18 2, 20 5, 20 20 L12 20 C12 5, 14 2, 16 2 Z" fill="%23e0e0e0"/><path d="M12 24 C12 28, 15 32, 16 32 C17 32, 20 28, 20 24 Z" fill="%23e0e0e0"/></g></svg>') 5 27, auto !important;
+        }
 
         html { scroll-behavior: smooth; }
         * { box-sizing: border-box; }
@@ -50,22 +52,7 @@
                 radial-gradient(rgba(197, 160, 89, 0.15) 1.5px, transparent 1.5px),
                 linear-gradient(135deg, #ffffff 0%, #fdf9f1 100%);
             background-size: 25px 25px, 100% 100%;
-            z-index: -5; pointer-events: none;
-        }
-
-        /* ================= 🌟 環境光影紙紋引擎 (Normal Map Lighting) ================= */
-        .paper-lighting {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none; z-index: -2; /* 提高層級，覆蓋在底色與光暈之上 */
-            /* 強化 SVG 高階粗糙水彩紙雜訊 */
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.5'/%3E%3C/svg%3E");
-            background-color: rgba(30, 20, 10, 0.08); /* 微微暖色壓暗 */
-            mix-blend-mode: color-burn; /* 色彩增值帶來強烈紙張對比 */
-            /* 擴大聚光燈半徑，且外圍保留 10% 亮度 */
-            mask-image: radial-gradient(circle 600px at var(--mouse-x, 50vw) var(--mouse-y, 50vh), rgba(0,0,0,1) 0%, rgba(0,0,0,0.1) 100%);
-            -webkit-mask-image: radial-gradient(circle 600px at var(--mouse-x, 50vw) var(--mouse-y, 50vh), rgba(0,0,0,1) 0%, rgba(0,0,0,0.1) 100%);
-            opacity: 0.85; /* 提高整體紋理能見度 */
-            will-change: mask-position, -webkit-mask-position;
+            z-index: -4; pointer-events: none;
         }
 
         .container, .hero { position: relative; z-index: 2; }
@@ -292,18 +279,83 @@
         .gallery-item.stagger-in { animation: staggerPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; transform: translateY(40px) scale(0.9); }
         @keyframes staggerPop { to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* ================= Lightbox ================= */
-        .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.92); display: flex; justify-content: center; align-items: center; z-index: 20000; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+        /* ================= 🌟 藝術卡片履歷浮雕 (Metadata Overlay) 高質感重構 ================= */
+        .metadata-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: auto;
+            background: linear-gradient(to top, rgba(20,20,20,0.95) 0%, rgba(20,20,20,0.7) 60%, transparent 100%);
+            color: #fff; padding: 50px 20px 20px;
+            transform: translateY(100%); opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s ease;
+            display: flex; flex-direction: column; gap: 8px; align-items: flex-start;
+            z-index: 10;
+        }
+        .gallery-item:hover .metadata-overlay { transform: translateY(0); opacity: 1; }
+
+        .meta-title { font-size: 1.1rem; font-weight: 700; letter-spacing: 2px; }
+        
+        /* 💡 Icon 樣式優化 */
+        .meta-info { font-size: 0.75rem; color: #d4d4d4; display: flex; gap: 12px; flex-wrap: wrap; }
+        .meta-info span i { color: var(--accent); margin-right: 6px; font-size: 0.8rem; }
+        
+        .view-process-btn {
+            margin-top: 10px; padding: 8px 18px;
+            background: var(--accent); border: 1px solid var(--accent); border-radius: 20px;
+            color: #fff; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+        .view-process-btn i { margin-right: 6px; }
+        .view-process-btn:hover { background: #fff; color: var(--text-dark); box-shadow: 0 5px 15px rgba(197, 160, 89, 0.4); }
+
+        /* ================= Lightbox 升級區 ================= */
+        .lightbox { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            z-index: 20000; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; 
+        }
         .lightbox.active { opacity: 1; pointer-events: all; }
-        .lightbox img { max-width: 90%; max-height: 85vh; object-fit: contain; border-radius: 8px; transform: scale(0.9); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); }
-        .lightbox.active img { transform: scale(1); }
-        .lightbox-close { position: absolute; top: 30px; right: 40px; color: rgba(255, 255, 255, 0.7); font-size: 50px; cursor: pointer; transition: var(--transition); line-height: 1; }
+        .lightbox-close { position: absolute; top: 30px; right: 40px; color: rgba(255, 255, 255, 0.7); font-size: 50px; cursor: pointer; transition: var(--transition); line-height: 1; z-index: 20002; }
         .lightbox-close:hover { color: #fff; transform: rotate(90deg); }
+        
+        /* 放大鏡視野框 */
+        .lightbox-content-wrapper {
+            position: relative; width: 100vw; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+        }
+        
+        #lightbox-img { 
+            max-width: 90%; max-height: 85vh; object-fit: contain; border-radius: 8px; 
+            transform: scale(0.9) translate(0px, 0px); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); 
+            cursor: zoom-in !important;
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s ease; 
+        }
+        .lightbox.active #lightbox-img { transform: scale(1) translate(0px, 0px); }
+        
+        /* 放大後的平移抓取狀態 */
+        #lightbox-img.zoomed { cursor: grab !important; transition: opacity 0.3s ease; }
+        #lightbox-img.zoomed:active { cursor: grabbing !important; }
+
+        /* 時光機控制面板 */
+        .process-timeline {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 15px; background: rgba(25, 25, 25, 0.8); padding: 12px 25px; border-radius: 50px;
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1);
+            opacity: 0; pointer-events: none; transition: all 0.4s;
+            transform: translate(-50%, 20px); z-index: 20001;
+        }
+        .lightbox.show-timeline .process-timeline { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+        
+        .step-btn {
+            background: transparent; border: 1px solid rgba(255,255,255,0.3);
+            color: #fff; padding: 8px 20px; border-radius: 20px;
+            transition: all 0.3s; font-size: 0.85rem; font-weight: 500; letter-spacing: 1px;
+        }
+        .step-btn.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 15px rgba(197, 160, 89, 0.4); }
+        .step-btn:hover:not(.active) { background: rgba(255,255,255,0.1); border-color: #fff; }
     </style>
 </head>
 
 <body>
-    <div class="paper-lighting"></div>
     <div class="bg-texture"></div>
 
     <div class="ambient-blobs">
@@ -422,28 +474,31 @@
                     <canvas id="gallery-wipe-canvas"></canvas>
 
                     <div class="gallery">
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art1.webp" alt="手繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art2.webp" alt="手繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art3.webp" alt="手繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art4.webp" alt="手繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art5.webp" alt="手繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art6.webp" alt="手繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art7.webp" alt="手繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art8.webp" alt="手繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand"><img src="hand/h_art9.webp" alt="手繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art1.webp" alt="電繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art2.webp" alt="電繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art3.webp" alt="電繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art4.webp" alt="電繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art5.webp" alt="電繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art6.webp" alt="電繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art7.webp" alt="電繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art8.webp" alt="電繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art9.webp" alt="電繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art10.webp" alt="電繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital"><img src="digital/d_art11.webp" alt="電繪" decoding="async"></div>                          
-                        <div class="gallery-item tilt-card" data-category="sketch"><img src="sketch/s_art1.webp" alt="素描" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="sketch"><img src="sketch/s_art2.webp" alt="素描" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital" data-title="《人物插畫》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art1.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital" data-title="《人物插畫》" data-year="2025" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art2.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital" data-title="《二創-鏈鋸人》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art3.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital" data-title="《模特參考-JENNIE》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art4.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital" data-title="《模特參考-JISOO》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art5.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital" data-title="《人物插畫》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art6.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital" data-title="《模特參考-LISA》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art7.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital" data-title="《人物插畫》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art8.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital" data-title="《人體結構練習》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art9.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital" data-title="《人體結構練習》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art10.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital" data-title="《二創-吉伊卡哇》" data-year="2024" data-tool="小畫家&滑鼠" data-hours="12"><img src="digital/d_art11.webp" alt="電繪" decoding="async"></div>
+
+                        <div class="gallery-item tilt-card" data-category="hand" data-title="《仿畫-鬼滅之刃》" data-year="2025" data-tool="帶針筆/麥克筆" data-hours="8"><img src="hand/h_art1.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand" data-title="《模特參考-Billie Eilish》" data-year="2025" data-tool="帶針筆/麥克筆" data-hours="8"><img src="hand/h_art2.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand" data-title="《人物插畫》" data-year="2025" data-tool="帶針筆/麥克筆" data-hours="8"><img src="hand/h_art3.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand" data-title="《人物插畫》" data-year="2025" data-tool="帶針筆/麥克筆" data-hours="8"><img src="hand/h_art4.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand" data-title="《仿畫-膽大黨》" data-year="2023" data-tool="原子筆" data-hours="8"><img src="hand/h_art5.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand" data-title="《仿畫-HUNTER×HUNTER》" data-year="2024" data-tool="帶針筆" data-hours="8"><img src="hand/h_art6.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand" data-title="《仿畫-一拳超人》" data-year="2022" data-tool="鉛筆" data-hours="8"><img src="hand/h_art7.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand" data-title="《仿畫-天國大魔鏡》" data-year="2023" data-tool="帶針筆" data-hours="8"><img src="hand/h_art8.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand" data-title="《仿畫-我的英雄學院》" data-year="2022" data-tool="鉛筆" data-hours="8"><img src="hand/h_art9.webp" alt="手繪" decoding="async"></div>
+                        
+                        <div class="gallery-item tilt-card" data-category="sketch" data-title="《素描-藤井風》" data-year="2026" data-tool="鉛筆" data-hours="4"><img src="sketch/s_art1.webp" alt="素描" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="sketch" data-title="《素描-Justin Bieber》" data-year="2026" data-tool="鉛筆" data-hours="4"><img src="sketch/s_art2.webp" alt="素描" decoding="async"></div>
+                        
                     </div>
                 </div>
 
@@ -500,62 +555,51 @@
 
     <div id="lightbox" class="lightbox">
         <span class="lightbox-close">&times;</span>
-        <img id="lightbox-img" src="" alt="Enlarged Project">
+        <div class="lightbox-content-wrapper">
+            <img id="lightbox-img" src="" alt="Enlarged Project">
+        </div>
+        
+        <div class="process-timeline" id="process-timeline">
+            <button class="step-btn" data-step="draft">1. 草稿</button>
+            <button class="step-btn" data-step="line">2. 線稿</button>
+            <button class="step-btn" data-step="base">3. 底色</button>
+            <button class="step-btn active" data-step="final">4. 完稿</button>
+        </div>
     </div>
 
     <script>
-        // ================= 💡 追蹤滑鼠位置，供光影紙紋遮罩使用 =================
-        window.addEventListener('mousemove', e => {
-            document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
-            document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
-        }, { passive: true });
-
-        // ================= 墨水消耗與沾水微遊戲機制 (Dynamic Ink Engine) =================
+        // ================= 墨水消耗與沾水微遊戲機制 =================
         let currentInkLevel = 100;
         const htmlRoot = document.documentElement;
 
         function updateInkLevel(amount) {
             currentInkLevel = Math.max(0, Math.min(100, currentInkLevel + amount));
             htmlRoot.style.setProperty('--ink-level', `${currentInkLevel}%`);
-            
-            if (currentInkLevel <= 0) {
-                htmlRoot.classList.add('out-of-ink');
-            } else {
-                htmlRoot.classList.remove('out-of-ink');
-            }
+            if (currentInkLevel <= 0) { htmlRoot.classList.add('out-of-ink'); } 
+            else { htmlRoot.classList.remove('out-of-ink'); }
         }
-        
-        // 提供外部呼叫，沾取滿墨水
         function refillInk() { updateInkLevel(100); }
 
-
-        // ================= WebP 顏料包散落引擎與防碰撞演算法 =================
+        // ================= WebP 顏料包散落引擎與防碰撞 =================
         const splatterContainer = document.getElementById('splatter-container');
 
         function getAvoidRects() {
             const rects = [];
             const selectors = '.hero-avatar-box, .subtitle, .hero-desc, .section-title, .about-content p, .skill-tags, .btn-cta, #contact p, .navbar';
-            const elements = document.querySelectorAll(selectors);
-            
-            elements.forEach(el => {
+            document.querySelectorAll(selectors).forEach(el => {
                 const rect = el.getBoundingClientRect();
                 rects.push({
-                    left: rect.left - 20, 
-                    right: rect.right + 20,
-                    top: rect.top + window.scrollY - 20,
-                    bottom: rect.bottom + window.scrollY + 20
+                    left: rect.left - 20, right: rect.right + 20,
+                    top: rect.top + window.scrollY - 20, bottom: rect.bottom + window.scrollY + 20
                 });
             });
-            
             const sig = document.querySelector('.hero-signature');
             if(sig) {
                 const rect = sig.getBoundingClientRect();
                 const centerOffset = rect.width * 0.15; 
                 rects.push({
-                    left: rect.left + centerOffset - 20,
-                    right: rect.right - centerOffset + 20,
-                    top: rect.top + window.scrollY + 40,
-                    bottom: rect.bottom + window.scrollY - 40
+                    left: rect.left + centerOffset - 20, right: rect.right - centerOffset + 20,
+                    top: rect.top + window.scrollY + 40, bottom: rect.bottom + window.scrollY - 40
                 });
             }
             return rects;
@@ -563,11 +607,9 @@
 
         function spawnWebpSplatters() {
             splatterContainer.innerHTML = ''; 
-            
             setTimeout(() => {
                 const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
                 const avoidRects = getAvoidRects();
-                
                 const webpData = [
                     { src: 'color/green.webp', rgb: '69, 185, 62' },   
                     { src: 'color/brown.webp', rgb: '143, 67, 43' },      
@@ -583,46 +625,30 @@
 
                 for(let i=0; i<totalSplatters; i++) {
                     const size = Math.random() * 250 + 350; 
-                    let x, y, cx, cy;
-                    let valid = false;
-                    let attempts = 0;
+                    let x, y, cx, cy; let valid = false; let attempts = 0;
 
                     while (!valid && attempts < 200) {
                         x = Math.random() * (window.innerWidth - size) + size / 2;
-                        
                         let yMin = Math.max(0, (i - 1) * chunkHeight);
                         let yMax = Math.min(docHeight - size, (i + 2) * chunkHeight);
                         y = Math.random() * (yMax - yMin) + yMin;
+                        cx = x; cy = y; valid = true;
 
-                        cx = x; 
-                        cy = y;
-
-                        valid = true;
-
-                        let splatterLeft = x - size / 2;
-                        let splatterRight = x + size / 2;
-                        let splatterTop = y - size / 2;
-                        let splatterBottom = y + size / 2;
+                        let splatterLeft = x - size / 2; let splatterRight = x + size / 2;
+                        let splatterTop = y - size / 2; let splatterBottom = y + size / 2;
 
                         for (let rect of avoidRects) {
-                            if (splatterRight > rect.left && splatterLeft < rect.right && 
-                                splatterBottom > rect.top && splatterTop < rect.bottom) {
-                                valid = false;
-                                break;
+                            if (splatterRight > rect.left && splatterLeft < rect.right && splatterBottom > rect.top && splatterTop < rect.bottom) {
+                                valid = false; break;
                             }
                         }
 
                         if (valid) {
                             for (let placed of placedSplatters) {
-                                let dx = cx - placed.cx;
-                                let dy = cy - placed.cy;
+                                let dx = cx - placed.cx; let dy = cy - placed.cy;
                                 let distance = Math.sqrt(dx * dx + dy * dy);
                                 let requiredDistance = (size / 2) + (placed.size / 2) + minGap;
-                                
-                                if (distance < requiredDistance) {
-                                    valid = false;
-                                    break;
-                                }
+                                if (distance < requiredDistance) { valid = false; break; }
                             }
                         }
                         attempts++;
@@ -630,70 +656,47 @@
 
                     if (valid) {
                         placedSplatters.push({ cx: cx, cy: cy, size: size });
-
                         const data = webpData[Math.floor(Math.random() * webpData.length)];
                         const img = document.createElement('img');
-                        
-                        img.src = data.src;
-                        img.classList.add('bg-webp-splatter');
-                        img.setAttribute('data-rgb', data.rgb);
-                        
+                        img.src = data.src; img.classList.add('bg-webp-splatter'); img.setAttribute('data-rgb', data.rgb);
                         const rot = Math.random() * 360;
-                        img.style.width = `${size}px`;
-                        img.style.left = `${x}px`;
-                        img.style.top = `${y}px`;
-                        img.style.setProperty('--rot', `${rot}deg`);
-
+                        img.style.width = `${size}px`; img.style.left = `${x}px`; img.style.top = `${y}px`; img.style.setProperty('--rot', `${rot}deg`);
                         splatterContainer.appendChild(img);
                     }
                 }
             }, 100); 
         }
-        
         window.addEventListener('load', spawnWebpSplatters);
 
-        // ================= 🎨 畫布作畫動畫印記 ＋ 🌟 極致水彩重力滴落 =================
+        // ================= 🎨 畫布作畫的彈跳動畫印記 ＋ 🌟 水彩重力滴落 =================
         const stampContainer = document.getElementById('stamp-container');
 
-        // 💡 移除 Flatten，徹底解決印記消失問題，保留最穩定的 DOM 作畫
         function drawPermanentStamp(pageX, pageY, rgb) {
-            // 枯筆判斷：沒墨水就不准畫！
             if (currentInkLevel <= 0) return;
 
             const stampDom = document.createElement('canvas');
             const size = Math.random() * 80 + 100; 
-            stampDom.width = 200;
-            stampDom.height = 200;
-            stampDom.className = 'anim-stamp';
-            stampDom.style.width = size + 'px';
-            stampDom.style.height = size + 'px';
-            stampDom.style.left = pageX + 'px';
-            stampDom.style.top = pageY + 'px';
+            stampDom.width = 200; stampDom.height = 200; stampDom.className = 'anim-stamp';
+            stampDom.style.width = size + 'px'; stampDom.style.height = size + 'px';
+            stampDom.style.left = pageX + 'px'; stampDom.style.top = pageY + 'px';
             
             const ctx = stampDom.getContext('2d');
             const cx = 100, cy = 100; 
+            ctx.translate(cx, cy); ctx.rotate(Math.random() * Math.PI * 2); ctx.translate(-cx, -cy);
 
-            ctx.translate(cx, cy);
-            ctx.rotate(Math.random() * Math.PI * 2);
-            ctx.translate(-cx, -cy);
-
-            // 計算當前墨水濃淡度 (Ink Opacity Factor)
             const inkFactor = Math.max(0.1, currentInkLevel / 100);
 
             let baseRadius = Math.random() * 30 + 30; 
             for(let i=0; i<8; i++) {
                 ctx.beginPath();
-                let offsetX = (Math.random() - 0.5) * baseRadius;
-                let offsetY = (Math.random() - 0.5) * baseRadius;
+                let offsetX = (Math.random() - 0.5) * baseRadius; let offsetY = (Math.random() - 0.5) * baseRadius;
                 ctx.arc(cx + offsetX, cy + offsetY, baseRadius * (Math.random() * 0.6 + 0.4), 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(${rgb}, ${(Math.random() * 0.04 + 0.01) * inkFactor})`; 
                 ctx.fill();
             }
-            
             for(let i=0; i<5; i++) {
                 ctx.beginPath();
-                let pX = cx + (Math.random() - 0.5) * 80;
-                let pY = cy + (Math.random() - 0.5) * 80;
+                let pX = cx + (Math.random() - 0.5) * 80; let pY = cy + (Math.random() - 0.5) * 80;
                 ctx.arc(pX, pY, Math.random() * 3 + 1, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(${rgb}, ${(Math.random() * 0.15 + 0.05) * inkFactor})`;
                 ctx.fill();
@@ -701,15 +704,14 @@
 
             stampContainer.appendChild(stampDom);
             
-            // 🌟 物理滴落邏輯優化：
-            // 只要墨水大於 10%，就有 70% 很高機率會流下顏料！
-            if (inkFactor > 0.1 && Math.random() > 0.3) {
-                const dripCount = Math.floor(Math.random() * 3) + 2; // 產生 2~4 條滴痕
+            // 物理滴落邏輯 (觸發門檻 45%)：
+            if (inkFactor >= 0.45 && Math.random() > 0.3) {
+                const dripCount = Math.floor(Math.random() * 3) + 2; 
                 for(let d = 0; d < dripCount; d++) {
                     const drip = document.createElement('div');
-                    const dripWidth = Math.random() * 4 + 2.5; // 寬度加粗：2.5px - 6.5px
-                    const dripLength = Math.random() * 200 + 100; // 滴流加長：100px - 300px
-                    const dripDuration = Math.random() * 3 + 2; // 緩慢流下：2s - 5s
+                    const dripWidth = Math.random() * 4 + 2.5; 
+                    const dripLength = Math.random() * 200 + 100; 
+                    const dripDuration = Math.random() * 3 + 2; 
                     
                     drip.className = 'ink-drip';
                     drip.style.width = `${dripWidth}px`;
@@ -723,8 +725,6 @@
                     stampContainer.appendChild(drip);
                 }
             }
-
-            // 💡 提升墨水續航力：蓋一次印記僅扣除 5 點墨水
             updateInkLevel(-5);
         }
 
@@ -734,17 +734,13 @@
 
         washBtn.addEventListener('click', () => {
             if(waterWave.classList.contains('washing')) return; 
-
             waterWave.style.transition = 'transform 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95)';
             waterWave.classList.add('washing');
             
-            // 洗筆順便把墨水補滿！
             refillInk();
 
             setTimeout(() => {
-                // 清空所有的 DOM 水墨印記與滴痕
                 stampContainer.innerHTML = '';
-                
                 const trailCanvas = document.getElementById('trail-canvas');
                 const tCtx = trailCanvas.getContext('2d');
                 tCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
@@ -752,53 +748,33 @@
             }, 600);
 
             setTimeout(() => {
-                waterWave.style.transition = 'none'; 
-                waterWave.classList.remove('washing'); 
+                waterWave.style.transition = 'none'; waterWave.classList.remove('washing'); 
             }, 1600);
         });
 
-        // ================= 實用功能：吸色時的筆尖短暫漣漪 =================
         function createColorSplash(clientX, clientY, rgb) {
             const splash = document.createElement('div');
-            splash.style.position = 'fixed';
-            splash.style.left = clientX + 'px';
-            splash.style.top = clientY + 'px';
-            splash.style.width = '20px';
-            splash.style.height = '20px';
-            splash.style.borderRadius = '50%';
-            splash.style.background = `rgba(${rgb}, 0.8)`;
-            splash.style.transform = 'translate(-50%, -50%) scale(1)';
-            splash.style.pointerEvents = 'none';
-            splash.style.zIndex = '999999';
-            splash.style.transition = 'all 0.4s ease-out';
+            splash.style.position = 'fixed'; splash.style.left = clientX + 'px'; splash.style.top = clientY + 'px';
+            splash.style.width = '20px'; splash.style.height = '20px'; splash.style.borderRadius = '50%';
+            splash.style.background = `rgba(${rgb}, 0.8)`; splash.style.transform = 'translate(-50%, -50%) scale(1)';
+            splash.style.pointerEvents = 'none'; splash.style.zIndex = '999999'; splash.style.transition = 'all 0.4s ease-out';
             document.body.appendChild(splash);
 
             void splash.offsetWidth;
-            splash.style.transform = 'translate(-50%, -50%) scale(4)';
-            splash.style.opacity = '0';
+            splash.style.transform = 'translate(-50%, -50%) scale(4)'; splash.style.opacity = '0';
             setTimeout(() => splash.remove(), 400);
         }
 
         // ================= 1. 3D 滑鼠追蹤懸浮 (Tilt Effect) =================
         const tiltCards = document.querySelectorAll('.tilt-card');
         
-        tiltCards.forEach(card => {
-            card.addEventListener('mousemove', handleTilt);
-            card.addEventListener('mouseenter', handleMouseEnter);
-            card.addEventListener('mouseleave', handleMouseLeave);
-        });
-
         function handleTilt(e) {
             const rect = this.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            const percentX = (x - centerX) / centerX;
-            const percentY = -(y - centerY) / centerY; 
+            const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+            const centerX = rect.width / 2; const centerY = rect.height / 2;
+            const percentX = (x - centerX) / centerX; const percentY = -(y - centerY) / centerY; 
             const maxTilt = 10;
-            const rotateX = percentY * maxTilt;
-            const rotateY = percentX * maxTilt;
+            const rotateX = percentY * maxTilt; const rotateY = percentX * maxTilt;
             this.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`;
         }
         function handleMouseEnter() { this.style.transition = 'transform 0.1s ease-out'; }
@@ -882,26 +858,22 @@
         window.addEventListener('resize', resizeTrail); resizeTrail();
 
         window.addEventListener('mousemove', e => {
-            // 💡 提升墨水續航力：移動所消耗的墨水大幅減少 (0.015 -> 0.003)
             if (lastMousePos.x !== null) {
                 let dist = Math.hypot(e.clientX - lastMousePos.x, e.clientY - lastMousePos.y);
                 if (dist > 0) updateInkLevel(-dist * 0.003); 
             }
             lastMousePos = { x: e.clientX, y: e.clientY };
-
             points.push({ x: e.clientX, y: e.clientY, age: 0 });
         }, { passive: true });
 
         function animateTrail() {
             tCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
             let rgbColor = getComputedStyle(document.documentElement).getPropertyValue('--current-brush-color').trim();
-
             tCtx.lineCap = 'round'; tCtx.lineJoin = 'round';
 
             points.forEach(p => p.age += 0.015);
             points = points.filter(p => p.age < 1);
 
-            // 計算全域拖尾墨水濃度
             const inkFactor = Math.max(0, currentInkLevel / 100);
 
             if (inkFactor > 0) {
@@ -911,7 +883,7 @@
                     let pressure = Math.max(0.5, 10 - speed * 0.1); 
 
                     tCtx.beginPath(); tCtx.moveTo(p0.x, p0.y); tCtx.lineTo(p1.x, p1.y);
-                    tCtx.strokeStyle = `rgba(${rgbColor}, ${life * 0.4 * inkFactor})`; // 套用枯筆透明度
+                    tCtx.strokeStyle = `rgba(${rgbColor}, ${life * 0.4 * inkFactor})`; 
                     tCtx.lineWidth = pressure * life; tCtx.stroke();
 
                     tCtx.beginPath(); tCtx.moveTo(p0.x + 3, p0.y + 3); tCtx.lineTo(p1.x + 3, p1.y + 3);
@@ -952,9 +924,7 @@
 
         swatches.forEach(swatch => {
             swatch.addEventListener('click', function(e) {
-                // 💡 點擊調色盤也算重新沾墨！
                 refillInk();
-
                 if (isFiltering || this.classList.contains('active')) return;
                 isFiltering = true;
 
@@ -1024,40 +994,90 @@
             });
         });
 
-        // ================= 6. 💡 點擊事件與吸色核心邏輯 =================
+        // ================= 🚀 防抖式延時非同步注入引擎 (高級 Icon 版) =================
+        setTimeout(() => {
+            const galleryItemsElements = document.querySelectorAll('.gallery-item');
+            galleryItemsElements.forEach(card => {
+                card.addEventListener('mousemove', handleTilt);
+                card.addEventListener('mouseenter', handleMouseEnter);
+                card.addEventListener('mouseleave', handleMouseLeave);
+
+                const cat = card.getAttribute('data-category');
+                const customTitle = card.getAttribute('data-title') || (cat === 'digital' ? '《數位色彩研究》' : cat === 'sketch' ? '《線條光影構造》' : '《紙本原稿手繪》');
+                const customYear = card.getAttribute('data-year') || '2026';
+                const customTool = card.getAttribute('data-tool') || (cat === 'digital' ? 'Clip Studio Paint' : cat === 'sketch' ? '鉛筆素描' : '不透明水彩');
+                const customHours = card.getAttribute('data-hours') || (Math.floor(Math.random() * 8) + 5);
+
+                const overlay = document.createElement('div');
+                overlay.className = 'metadata-overlay';
+                // 💡 替換為 FontAwesome 高級 Icon
+                overlay.innerHTML = `
+                    <div class="meta-title">${customTitle}</div>
+                    <div class="meta-info">
+                        <span><i class="fa-regular fa-calendar"></i>${customYear}</span>
+                        <span><i class="fa-solid fa-palette"></i>${customTool}</span>
+                        <span><i class="fa-regular fa-clock"></i>${customHours} Hours</span>
+                    </div>
+                    <button class="view-process-btn"><i class="fa-solid fa-layer-group"></i>觀看作畫過程</button>
+                `;
+                card.appendChild(overlay);
+            });
+        }, 600); 
+
+        // ================= 🌟 點擊事件、X光放大鏡與時光機核心邏輯 =================
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
+        const timeline = document.getElementById('process-timeline');
+        
+        let zoomScale = 1; let isPanning = false, hasDragged = false;
+        let pointX = 0, pointY = 0, startX = 0, startY = 0;
+
+        function resetLightbox() {
+            lightbox.classList.remove('active', 'show-timeline');
+            zoomScale = 1; lightboxImg.classList.remove('zoomed');
+            lightboxImg.style.transform = `scale(1) translate(0px, 0px)`;
+            pointX = 0; pointY = 0; lightboxImg.className = ''; 
+        }
 
         document.addEventListener('click', function(e) {
-            // 排除 Lightbox 點擊
+            if (e.target.closest('.wash-btn') || e.target.closest('.paint-swatch')) return;
             if (e.target.id === 'lightbox' || e.target.classList.contains('lightbox-close')) {
-                lightbox.classList.remove('active'); return;
+                resetLightbox(); return;
             }
-            // 排除調色盤
-            if (e.target.closest('.paint-swatch')) return;
 
             let el = e.target;
             let currentBrushColor = getComputedStyle(document.documentElement).getPropertyValue('--current-brush-color').trim();
-            
-            let isColorPicked = false;
-            let pickedRGB = currentBrushColor;
+            let isColorPicked = false; let pickedRGB = currentBrushColor;
 
+            // 👑 狀況 1：點擊「觀看作畫過程」按鈕
+            if (el.closest('.view-process-btn')) {
+                const item = el.closest('.gallery-item');
+                const imgSrc = item.querySelector('img').src; 
+                lightboxImg.src = imgSrc; 
+                lightboxImg.setAttribute('data-original-src', imgSrc);
+                lightbox.classList.add('active', 'show-timeline');
+                
+                document.querySelectorAll('.step-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelector('.step-btn[data-step="final"]').classList.add('active');
+                return; 
+            }
+
+            // 👑 狀況 2：點擊畫廊圖片本身
             if (el.tagName.toLowerCase() === 'img' && el.closest('.gallery-item')) {
-                lightboxImg.src = el.src; 
-                lightbox.classList.add('active'); 
+                refillInk(); 
+                const imgSrc = el.src; lightboxImg.src = imgSrc; lightboxImg.setAttribute('data-original-src', imgSrc);
+                lightbox.classList.add('active'); lightbox.classList.remove('show-timeline'); 
+                
                 try {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 1; canvas.height = 1;
+                    const canvas = document.createElement('canvas'); canvas.width = 1; canvas.height = 1;
                     const ctx = canvas.getContext('2d', { willReadFrequently: true });
                     const rect = el.getBoundingClientRect();
                     const px = ((e.clientX - rect.left) / rect.width) * el.naturalWidth;
                     const py = ((e.clientY - rect.top) / rect.height) * el.naturalHeight;
-                    
                     ctx.drawImage(el, px, py, 1, 1, 0, 0, 1, 1);
                     const data = ctx.getImageData(0, 0, 1, 1).data;
                     if (data[3] === 0) throw new Error("Transparent");
-                    pickedRGB = `${data[0]}, ${data[1]}, ${data[2]}`;
-                    isColorPicked = true;
+                    pickedRGB = `${data[0]}, ${data[1]}, ${data[2]}`; isColorPicked = true;
                 } catch (err) {
                     const cat = el.closest('.gallery-item').getAttribute('data-category');
                     if (cat === 'sketch') pickedRGB = '158, 161, 163';
@@ -1065,30 +1085,104 @@
                     else if (cat === 'hand') pickedRGB = '212, 122, 126';
                     isColorPicked = true;
                 }
+                document.documentElement.style.setProperty('--current-brush-color', pickedRGB);
+                createColorSplash(e.clientX, e.clientY, pickedRGB);
+                return; 
             } 
-            else if (el.closest('.hero-signature') || el.closest('.btn-cta') || el.closest('.parallax-watermark') || el.closest('.navbar')) {
-                pickedRGB = '197, 160, 89'; 
-                isColorPicked = true;
+            
+            // 👑 狀況 3：點擊手寫簽名、按鈕或導覽列
+            if (el.closest('.hero-signature') || el.closest('.btn-cta') || el.closest('.parallax-watermark') || el.closest('.navbar')) {
+                refillInk(); pickedRGB = '197, 160, 89'; isColorPicked = true;
             } 
+            // 👑 狀況 4：X光透視吸色
             else {
                 const clickedElements = document.elementsFromPoint(e.clientX, e.clientY);
                 const splatterEl = clickedElements.find(elem => elem.classList.contains('bg-webp-splatter'));
-
-                if (splatterEl) {
-                    pickedRGB = splatterEl.getAttribute('data-rgb');
-                    isColorPicked = true;
-                }
+                if (splatterEl) { refillInk(); pickedRGB = splatterEl.getAttribute('data-rgb'); isColorPicked = true; }
             }
             
             if (isColorPicked) {
-                // 💡 吸色等於沾墨！
-                refillInk();
                 document.documentElement.style.setProperty('--current-brush-color', pickedRGB);
                 createColorSplash(e.clientX, e.clientY, pickedRGB);
             } else {
                 drawPermanentStamp(e.pageX, e.pageY, currentBrushColor);
             }
         });
+
+        // ================= 時光機時間軸按鈕切換 =================
+        document.getElementById('process-timeline').addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            if (e.target.classList.contains('step-btn')) {
+                document.querySelectorAll('.step-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                const step = e.target.getAttribute('data-step');
+                
+                const originalSrc = lightboxImg.getAttribute('data-original-src');
+                const dotIndex = originalSrc.lastIndexOf('.');
+                const noExt = originalSrc.substring(0, dotIndex);
+                const ext = originalSrc.substring(dotIndex);
+
+                if (step === 'final') {
+                    lightboxImg.src = originalSrc;
+                } else {
+                    lightboxImg.src = `${noExt}_${step}${ext}`;
+                }
+            }
+        });
+
+        // ================= X光放大鏡引擎 =================
+        lightboxImg.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            
+            if (hasDragged) {
+                hasDragged = false; 
+                return;
+            }
+
+            if (zoomScale === 1) {
+                zoomScale = 2.5; 
+                lightboxImg.classList.add('zoomed');
+                const rect = lightboxImg.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                lightboxImg.style.transformOrigin = `${x}% ${y}%`;
+                lightboxImg.style.transform = `scale(${zoomScale})`;
+            } else {
+                zoomScale = 1;
+                lightboxImg.classList.remove('zoomed');
+                lightboxImg.style.transform = `scale(1) translate(0px, 0px)`;
+                pointX = 0; pointY = 0;
+            }
+        });
+
+        lightboxImg.addEventListener('mousedown', (e) => {
+            if (zoomScale > 1) {
+                e.preventDefault(); 
+                isPanning = true; 
+                hasDragged = false; 
+                startX = e.clientX - pointX; 
+                startY = e.clientY - pointY;
+            }
+        });
+        
+        window.addEventListener('mousemove', (e) => {
+            if (!isPanning) return;
+            
+            if (Math.abs(e.clientX - startX - pointX) > 5 || Math.abs(e.clientY - startY - pointY) > 5) {
+                hasDragged = true; 
+            }
+
+            pointX = e.clientX - startX; 
+            pointY = e.clientY - startY;
+            lightboxImg.style.transform = `scale(${zoomScale}) translate(${pointX/zoomScale}px, ${pointY/zoomScale}px)`;
+        });
+        
+        window.addEventListener('mouseup', () => { 
+            isPanning = false; 
+            setTimeout(() => { hasDragged = false; }, 100); 
+        });
+        
+        window.addEventListener('mouseleave', () => { isPanning = false; });
 
         // ================= 滾動邏輯 =================
         const observer = new IntersectionObserver((entries) => {
