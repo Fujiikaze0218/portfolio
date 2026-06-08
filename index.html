@@ -29,13 +29,29 @@
         }
 
         /* 💡 全局設定：背景透明，防止覆蓋負值 z-index 特效 */
-        html, body { 
-            margin: 0; padding: 0; width: 100%;
+        html {
+            margin: 0; 
+            padding: 0; 
+            width: 100%;
+            min-height: 100%;
+            overflow-x: clip;
+            background-color: transparent;
+            scroll-behavior: smooth;
+            scroll-padding-top: 110px;
+        }
+
+        body { 
+            margin: 0; 
+            padding: 0; 
+            width: 100%;
+            min-height: 100%;
+            overflow-x: clip;
             background-color: transparent; 
             font-family: 'Noto Sans TC', sans-serif; 
-            color: var(--text-dark); line-height: 1.8; 
-            overflow-x: hidden; scroll-behavior: smooth;
-            -webkit-user-select: none; user-select: none;
+            color: var(--text-dark); 
+            line-height: 1.8; 
+            -webkit-user-select: none; 
+            user-select: none;
         }
         * { box-sizing: border-box; }
 
@@ -58,11 +74,19 @@
         /* ================= 繪圖與動態容器 ================= */
         .container, .hero { position: relative; z-index: 2; }
         
-        #splatter-container { position: absolute; top: 0; left: 0; width: 100%; pointer-events: none; z-index: 1; }
+        #splatter-container { position: absolute; top: 0; left: 0; width: 100%; overflow-x: clip; pointer-events: none; z-index: 1; }
         .bg-webp-splatter { position: absolute; pointer-events: auto; transform-origin: center; transform: translate(-50%, -50%) rotate(var(--rot)) scale(1); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s; mix-blend-mode: multiply; opacity: 0.85; }
         .bg-webp-splatter:hover { transform: translate(-50%, -50%) rotate(var(--rot)) scale(1.15); filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2)); z-index: 10; }
 
-        #stamp-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; overflow: visible; }
+        #stamp-container {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 3;
+            overflow: hidden;
+        }
         .anim-stamp { position: absolute; pointer-events: none; mix-blend-mode: multiply; animation: stampPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes stampPop { 0% { transform: translate(-50%, -50%) scale(0.1); opacity: 0; } 40% { opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.85; } }
 
@@ -194,7 +218,8 @@
         .lightbox.show-timeline .process-timeline { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
         .step-btn { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 8px 20px; border-radius: 20px; transition: all 0.3s; font-size: 0.85rem; font-weight: 500; letter-spacing: 1px; }
         .step-btn.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 15px rgba(197, 160, 89, 0.4); }
-        .step-btn:hover:not(.active) { background: rgba(255,255,255,0.1); border-color: #fff; }
+        .step-btn:hover:not(.active):not(:disabled) { background: rgba(255,255,255,0.1); border-color: #fff; }
+        .step-btn:disabled { opacity: 0.35; cursor: not-allowed !important; }
 
         /* ================= 📱 響應式佈局 (RWD) ================= */
         @media (max-width: 992px) {
@@ -207,30 +232,53 @@
         }
 
         @media (max-width: 768px) {
-            .navbar { gap: 15px; padding: 15px 10px; flex-wrap: wrap; }
-            .navbar a { font-size: 0.9rem; letter-spacing: 1px; }
+            html, body { max-width: 100%; }
+
+            .navbar { gap: 0; padding: 10px 8px; justify-content: space-around; flex-wrap: nowrap; }
+            .navbar a { font-size: 0.78rem; letter-spacing: 0; white-space: nowrap; }
             
+            .hero { height: auto; min-height: 100svh; padding: 88px 16px 48px; justify-content: flex-start; }
             .hero-title-group { flex-direction: column; }
             /* 僅在手機縮小 Logo，絕不影響桌機 */
-            .hero-avatar-box { width: 180px; height: 180px; }
-            .hero-signature { width: 90vw; height: auto; }
-            .hero p.subtitle { font-size: 1.1rem; letter-spacing: 8px; }
-            .hero-desc { font-size: 0.9rem; letter-spacing: 2px; }
+            .hero-avatar-box { width: 132px; height: 132px; padding: 5px; }
+            .hero-signature { width: min(92vw, 430px); height: auto; }
+            .sig-text { font-size: 12rem; }
+            .hero p.subtitle { font-size: 0.95rem; letter-spacing: 3px; text-indent: 0; margin-top: 12px; }
+            .hero-desc { font-size: 0.88rem; letter-spacing: 1px; line-height: 1.9; margin-bottom: 26px; }
+            .btn-cta { max-width: 100%; padding: 12px 20px; font-size: 0.78rem; letter-spacing: 1px; }
             
-            .section { padding: 60px 15px; overflow: hidden; }
+            .section { padding: 72px 15px; overflow-x: clip; overflow-y: visible; scroll-margin-top: 72px; }
+            .section-title { font-size: 1.45rem; letter-spacing: 4px; text-indent: 4px; margin-bottom: 46px; }
             .parallax-watermark { font-size: 10rem; }
+            .about-content > div { font-size: 0.96rem !important; text-align: left !important; }
+            .skills-wrapper { gap: 18px; }
+            .skill-category { min-width: 0; width: 100%; padding: 22px 16px; }
+            .skill-tags { gap: 8px; }
+            .skill-tags span { padding: 7px 13px; font-size: 0.8rem; }
             
             /* 💡 手機版強制將畫廊改為一欄直向 Flexbox，絕不消失！ */
-            .gallery { display: flex; flex-direction: column; width: 100%; }
-            .gallery-item { width: 100%; margin-bottom: 25px; border-radius: 12px; }
+            .gallery { display: flex; flex-direction: column; width: 100%; column-count: auto; column-gap: 0; }
+            .gallery-item { display: block; width: 100%; margin-bottom: 25px; border-radius: 12px; opacity: 1; transform: none; }
+            .gallery-item img { display: block; width: 100%; height: auto; opacity: 1; }
+            .gallery-item.stagger-in { animation: none; opacity: 1; transform: none; }
+            .gallery-item:hover img { transform: none; }
             
-            .palette-sidebar { height: 260px; }
-            .flat-palette { transform: scale(0.6) rotate(-6deg); }
+            .portfolio-layout { gap: 22px; padding: 0; }
+            .gallery-wrapper { min-height: 0; overflow: visible; }
+            #gallery-wipe-canvas {
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100svh;
+                z-index: 15000;
+            }
+            .palette-sidebar { height: 218px; margin-bottom: 18px; overflow: clip; }
+            .flat-palette { width: 340px; height: 270px; transform: scale(0.68) rotate(-6deg); }
             
             .ink-gauge-wrapper { right: 10px; height: 150px; width: 10px; }
             .wash-btn { right: 15px; bottom: 15px; width: 50px; height: 50px; font-size: 20px; }
             
-            .process-timeline { width: 95vw; flex-wrap: wrap; justify-content: center; padding: 10px; gap: 8px; bottom: 15px; }
+            .process-timeline { width: calc(100vw - 20px); flex-wrap: wrap; justify-content: center; padding: 10px; gap: 8px; bottom: 15px; border-radius: 18px; }
             .step-btn { padding: 6px 12px; font-size: 0.75rem; border-radius: 15px; }
             .lightbox-close { top: 15px; right: 20px; font-size: 40px; }
             
@@ -241,12 +289,11 @@
                 background: linear-gradient(to top, rgba(20,20,20,0.85) 0%, rgba(20,20,20,0.4) 70%, transparent 100%);
             }
         }
-
-        
     </style>
 </head>
 
 <body>
+    
     <div class="vignette-overlay"></div>
     <div class="bg-texture"></div>
     <canvas id="dust-canvas"></canvas>
@@ -362,20 +409,20 @@
                 <div class="gallery-wrapper">
                     <canvas id="gallery-wipe-canvas"></canvas>
                     <div class="gallery">
-                        <div class="gallery-item tilt-card" data-category="digital" data-title="《人物插畫》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art1.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital" data-title="《人物插畫》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12" data-process="draft,line,base"><img src="digital/d_art1.webp" alt="電繪" decoding="async"></div>
                         <div class="gallery-item tilt-card" data-category="digital" data-title="《人物插畫》" data-year="2025" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art2.webp" alt="電繪" decoding="async"></div>
                         <div class="gallery-item tilt-card" data-category="digital" data-title="《二創-鏈鋸人》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art3.webp" alt="電繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital" data-title="《模特參考-JENNIE》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art4.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital" data-title="《模特參考-JENNIE》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12" data-process="draft,line,base"><img src="digital/d_art4.webp" alt="電繪" decoding="async"></div>
                         <div class="gallery-item tilt-card" data-category="digital" data-title="《模特參考-JISOO》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art5.webp" alt="電繪" decoding="async"></div>
                         <div class="gallery-item tilt-card" data-category="digital" data-title="《人物插畫》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art6.webp" alt="電繪" decoding="async"></div>
                         <div class="gallery-item tilt-card" data-category="digital" data-title="《模特參考-LISA》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art7.webp" alt="電繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="digital" data-title="《人物插畫》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art8.webp" alt="電繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="digital" data-title="《人物插畫》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12" data-process="draft,line,base"><img src="digital/d_art8.webp" alt="電繪" decoding="async"></div>
                         <div class="gallery-item tilt-card" data-category="digital" data-title="《人體結構練習》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art9.webp" alt="電繪" decoding="async"></div>
                         <div class="gallery-item tilt-card" data-category="digital" data-title="《人體結構練習》" data-year="2026" data-tool="Clip Studio Paint" data-hours="12"><img src="digital/d_art10.webp" alt="電繪" decoding="async"></div>
                         <div class="gallery-item tilt-card" data-category="digital" data-title="《二創-吉伊卡哇》" data-year="2024" data-tool="小畫家&滑鼠" data-hours="12"><img src="digital/d_art11.webp" alt="電繪" decoding="async"></div>
 
-                        <div class="gallery-item tilt-card" data-category="hand" data-title="《仿畫-鬼滅之刃》" data-year="2025" data-tool="帶針筆/麥克筆" data-hours="8"><img src="hand/h_art1.webp" alt="手繪" decoding="async"></div>
-                        <div class="gallery-item tilt-card" data-category="hand" data-title="《模特參考-Billie Eilish》" data-year="2025" data-tool="帶針筆/麥克筆" data-hours="8"><img src="hand/h_art2.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand" data-title="《仿畫-鬼滅之刃》" data-year="2025" data-tool="帶針筆/麥克筆" data-hours="8" data-process="draft,line,base"><img src="hand/h_art1.webp" alt="手繪" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="hand" data-title="《模特參考-Billie Eilish》" data-year="2025" data-tool="帶針筆/麥克筆" data-hours="8" data-process="line"><img src="hand/h_art2.webp" alt="手繪" decoding="async"></div>
                         <div class="gallery-item tilt-card" data-category="hand" data-title="《人物插畫》" data-year="2025" data-tool="帶針筆/麥克筆" data-hours="8"><img src="hand/h_art3.webp" alt="手繪" decoding="async"></div>
                         <div class="gallery-item tilt-card" data-category="hand" data-title="《人物插畫》" data-year="2025" data-tool="帶針筆/麥克筆" data-hours="8"><img src="hand/h_art4.webp" alt="手繪" decoding="async"></div>
                         <div class="gallery-item tilt-card" data-category="hand" data-title="《仿畫-膽大黨》" data-year="2023" data-tool="原子筆" data-hours="8"><img src="hand/h_art5.webp" alt="手繪" decoding="async"></div>
@@ -384,7 +431,7 @@
                         <div class="gallery-item tilt-card" data-category="hand" data-title="《仿畫-天國大魔鏡》" data-year="2023" data-tool="帶針筆" data-hours="8"><img src="hand/h_art8.webp" alt="手繪" decoding="async"></div>
                         <div class="gallery-item tilt-card" data-category="hand" data-title="《仿畫-我的英雄學院》" data-year="2022" data-tool="鉛筆" data-hours="8"><img src="hand/h_art9.webp" alt="手繪" decoding="async"></div>
                         
-                        <div class="gallery-item tilt-card" data-category="sketch" data-title="《素描-藤井風》" data-year="2026" data-tool="鉛筆" data-hours="4"><img src="sketch/s_art1.webp" alt="素描" decoding="async"></div>
+                        <div class="gallery-item tilt-card" data-category="sketch" data-title="《素描-藤井風》" data-year="2026" data-tool="鉛筆" data-hours="4" data-process="draft,line"><img src="sketch/s_art1.webp" alt="素描" decoding="async"></div>
                         <div class="gallery-item tilt-card" data-category="sketch" data-title="《素描-Justin Bieber》" data-year="2026" data-tool="鉛筆" data-hours="4"><img src="sketch/s_art2.webp" alt="素描" decoding="async"></div>
                     </div>
                 </div>
@@ -481,23 +528,52 @@
         // ================= WebP 顏料包散落引擎與防碰撞 =================
         const splatterContainer = document.getElementById('splatter-container');
 
+        function getPageScrollY() {
+            return window.scrollY || document.documentElement.scrollTop || 0;
+        }
+
+        function scrollToSection(target) {
+            const navbar = document.querySelector('.navbar');
+            const navOffset = navbar ? navbar.offsetHeight + 24 : 0;
+            const targetTop = target.getBoundingClientRect().top + getPageScrollY() - navOffset;
+            const maxTop = document.documentElement.scrollHeight - window.innerHeight;
+
+            window.scrollTo({
+                top: Math.max(0, Math.min(targetTop, maxTop)),
+                behavior: 'smooth'
+            });
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', (e) => {
+                const target = document.querySelector(anchor.getAttribute('href'));
+                if (!target) return;
+
+                e.preventDefault();
+                scrollToSection(target);
+                history.replaceState(null, '', anchor.getAttribute('href'));
+            });
+        });
+
         function getAvoidRects() {
             const rects = [];
             const selectors = '.hero-avatar-box, .subtitle, .hero-desc, .section-title, .about-content p, .skill-tags, .btn-cta, #contact p, .navbar';
             document.querySelectorAll(selectors).forEach(el => {
                 const rect = el.getBoundingClientRect();
+                const scrollY = getPageScrollY();
                 rects.push({
                     left: rect.left - 20, right: rect.right + 20,
-                    top: rect.top + window.scrollY - 20, bottom: rect.bottom + window.scrollY + 20
+                    top: rect.top + scrollY - 20, bottom: rect.bottom + scrollY + 20
                 });
             });
             const sig = document.querySelector('.hero-signature');
             if(sig) {
                 const rect = sig.getBoundingClientRect();
+                const scrollY = getPageScrollY();
                 const centerOffset = rect.width * 0.15; 
                 rects.push({
                     left: rect.left + centerOffset - 20, right: rect.right - centerOffset + 20,
-                    top: rect.top + window.scrollY + 40, bottom: rect.bottom + window.scrollY - 40
+                    top: rect.top + scrollY + 40, bottom: rect.bottom + scrollY - 40
                 });
             }
             return rects;
@@ -817,7 +893,7 @@
         window.addEventListener('scroll', () => {
             let scrollPosition = window.scrollY;
             watermark.style.transform = `translate(-50%, ${scrollPosition * 0.25}px)`;
-        });
+        }, { passive: true });
 
         // ================= 5. 調色盤切換潑墨動畫 =================
         const swatches = document.querySelectorAll('.paint-swatch');
@@ -828,6 +904,11 @@
 
         function resizeWipeCanvas() {
             const wrapper = document.querySelector('.gallery-wrapper');
+            if (window.matchMedia('(max-width: 768px)').matches) {
+                wipeCanvas.width = window.innerWidth;
+                wipeCanvas.height = window.innerHeight;
+                return;
+            }
             wipeCanvas.width = wrapper.offsetWidth * 1.1; wipeCanvas.height = wrapper.offsetHeight * 1.1;
         }
         window.addEventListener('resize', resizeWipeCanvas); resizeWipeCanvas();
@@ -913,6 +994,10 @@
                 const customYear = card.getAttribute('data-year') || '2026';
                 const customTool = card.getAttribute('data-tool') || (cat === 'digital' ? 'Clip Studio Paint' : cat === 'sketch' ? '鉛筆素描' : '不透明水彩');
                 const customHours = card.getAttribute('data-hours') || (Math.floor(Math.random() * 8) + 5);
+                const processSteps = getProcessSteps(card);
+                const processButton = processSteps.length
+                    ? '<button class="view-process-btn"><i class="fa-solid fa-layer-group"></i>觀看作畫過程</button>'
+                    : '';
 
                 const overlay = document.createElement('div');
                 overlay.className = 'metadata-overlay';
@@ -923,7 +1008,7 @@
                         <span><i class="fa-solid fa-pen-nib"></i>${customTool}</span>
                         <span><i class="fa-regular fa-clock"></i>${customHours} Hours</span>
                     </div>
-                    <button class="view-process-btn"><i class="fa-solid fa-layer-group"></i>觀看作畫過程</button>
+                    ${processButton}
                 `;
                 card.appendChild(overlay);
             });
@@ -937,11 +1022,41 @@
         let zoomScale = 1; let isPanning = false, hasDragged = false;
         let pointX = 0, pointY = 0, startX = 0, startY = 0;
 
+        function getProcessSteps(item) {
+            return (item.getAttribute('data-process') || '')
+                .split(',')
+                .map(step => step.trim())
+                .filter(Boolean);
+        }
+
+        function updateTimelineSteps(processSteps) {
+            document.querySelectorAll('.step-btn').forEach(btn => {
+                const step = btn.getAttribute('data-step');
+                const isAvailable = step === 'final' || processSteps.includes(step);
+                btn.disabled = !isAvailable;
+                btn.setAttribute('aria-disabled', String(!isAvailable));
+                btn.classList.toggle('active', step === 'final');
+            });
+        }
+
+        function getEventPoint(e) {
+            const touch = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]);
+            return {
+                clientX: typeof e.clientX === 'number' ? e.clientX : (touch ? touch.clientX : null),
+                clientY: typeof e.clientY === 'number' ? e.clientY : (touch ? touch.clientY : null)
+            };
+        }
+
+        function hasValidPoint(point) {
+            return Number.isFinite(point.clientX) && Number.isFinite(point.clientY);
+        }
+
         function resetLightbox() {
             lightbox.classList.remove('active', 'show-timeline');
             zoomScale = 1; lightboxImg.classList.remove('zoomed');
             lightboxImg.style.transform = `scale(1) translate(0px, 0px)`;
             pointX = 0; pointY = 0; lightboxImg.className = ''; 
+            lightboxImg.removeAttribute('data-process-steps');
         }
 
         document.addEventListener('click', function(e) {
@@ -953,17 +1068,20 @@
             let el = e.target;
             let currentBrushColor = getComputedStyle(document.documentElement).getPropertyValue('--current-brush-color').trim();
             let isColorPicked = false; let pickedRGB = currentBrushColor;
+            const point = getEventPoint(e);
 
             // 👑 狀況 1：點擊「觀看作畫過程」按鈕
             if (el.closest('.view-process-btn')) {
                 const item = el.closest('.gallery-item');
+                const processSteps = getProcessSteps(item);
+                if (!processSteps.length) return;
+
                 const imgSrc = item.querySelector('img').src; 
                 lightboxImg.src = imgSrc; 
                 lightboxImg.setAttribute('data-original-src', imgSrc);
+                lightboxImg.setAttribute('data-process-steps', processSteps.join(','));
                 lightbox.classList.add('active', 'show-timeline');
-                
-                document.querySelectorAll('.step-btn').forEach(btn => btn.classList.remove('active'));
-                document.querySelector('.step-btn[data-step="final"]').classList.add('active');
+                updateTimelineSteps(processSteps);
                 return; 
             }
 
@@ -978,8 +1096,9 @@
                     const ctx = canvas.getContext('2d', { willReadFrequently: true });
                     const rect = el.getBoundingClientRect();
                     
-                    const clickX = e.clientX || (e.touches && e.touches[0].clientX);
-                    const clickY = e.clientY || (e.touches && e.touches[0].clientY);
+                    const clickX = point.clientX;
+                    const clickY = point.clientY;
+                    if (!hasValidPoint(point)) throw new Error("Missing click point");
                     
                     const px = ((clickX - rect.left) / rect.width) * el.naturalWidth;
                     const py = ((clickY - rect.top) / rect.height) * el.naturalHeight;
@@ -995,9 +1114,7 @@
                     isColorPicked = true;
                 }
                 document.documentElement.style.setProperty('--current-brush-color', pickedRGB);
-                const splashX = e.clientX || (e.touches && e.touches[0].clientX);
-                const splashY = e.clientY || (e.touches && e.touches[0].clientY);
-                createColorSplash(splashX, splashY, pickedRGB);
+                if (hasValidPoint(point)) createColorSplash(point.clientX, point.clientY, pickedRGB);
                 return; 
             } 
             
@@ -1007,10 +1124,8 @@
             } 
             // 👑 狀況 4：X光透視吸色 (兼容手機觸控)
             else {
-                const clickX = e.clientX || (e.touches && e.touches[0].clientX);
-                const clickY = e.clientY || (e.touches && e.touches[0].clientY);
-                if(clickX && clickY) {
-                    const clickedElements = document.elementsFromPoint(clickX, clickY);
+                if(hasValidPoint(point)) {
+                    const clickedElements = document.elementsFromPoint(point.clientX, point.clientY);
                     const splatterEl = clickedElements.find(elem => elem.classList.contains('bg-webp-splatter'));
                     if (splatterEl) { refillInk(); pickedRGB = splatterEl.getAttribute('data-rgb'); isColorPicked = true; }
                 }
@@ -1018,33 +1133,36 @@
             
             if (isColorPicked) {
                 document.documentElement.style.setProperty('--current-brush-color', pickedRGB);
-                const clickX = e.clientX || (e.touches && e.touches[0].clientX);
-                const clickY = e.clientY || (e.touches && e.touches[0].clientY);
-                createColorSplash(clickX, clickY, pickedRGB);
+                if (hasValidPoint(point)) createColorSplash(point.clientX, point.clientY, pickedRGB);
             } else {
-                const clickX = e.pageX || (e.touches && e.touches[0].pageX);
-                const clickY = e.pageY || (e.touches && e.touches[0].pageY);
-                if(clickX && clickY) drawPermanentStamp(clickX, clickY, currentBrushColor);
+                if(hasValidPoint(point)) drawPermanentStamp(point.clientX, point.clientY, currentBrushColor);
             }
         });
 
         // ================= 時光機時間軸按鈕切換 =================
         document.getElementById('process-timeline').addEventListener('click', (e) => {
             e.stopPropagation(); 
-            if (e.target.classList.contains('step-btn')) {
+            const targetButton = e.target.closest('.step-btn');
+            if (targetButton && !targetButton.disabled) {
                 document.querySelectorAll('.step-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                const step = e.target.getAttribute('data-step');
+                targetButton.classList.add('active');
+                const step = targetButton.getAttribute('data-step');
                 
                 const originalSrc = lightboxImg.getAttribute('data-original-src');
+                if (!originalSrc) return;
+
                 const dotIndex = originalSrc.lastIndexOf('.');
                 const noExt = originalSrc.substring(0, dotIndex);
                 const ext = originalSrc.substring(dotIndex);
+                const processSteps = (lightboxImg.getAttribute('data-process-steps') || '').split(',');
 
                 if (step === 'final') {
                     lightboxImg.src = originalSrc;
-                } else {
+                } else if (processSteps.includes(step)) {
                     lightboxImg.src = `${noExt}_${step}${ext}`;
+                } else {
+                    document.querySelector('.step-btn[data-step="final"]').classList.add('active');
+                    targetButton.classList.remove('active');
                 }
             }
         });
@@ -1065,12 +1183,11 @@
                 
                 lightboxImg.classList.add('zoomed');
                 const rect = lightboxImg.getBoundingClientRect();
-                
-                const clickX = e.clientX || (e.touches && e.touches[0].clientX);
-                const clickY = e.clientY || (e.touches && e.touches[0].clientY);
+                const point = getEventPoint(e);
+                if (!hasValidPoint(point)) return;
 
-                const x = ((clickX - rect.left) / rect.width) * 100;
-                const y = ((clickY - rect.top) / rect.height) * 100;
+                const x = ((point.clientX - rect.left) / rect.width) * 100;
+                const y = ((point.clientY - rect.top) / rect.height) * 100;
                 lightboxImg.style.transformOrigin = `${x}% ${y}%`;
                 lightboxImg.style.transform = `scale(${zoomScale})`;
             } else {
