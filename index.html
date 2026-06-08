@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>doyoda | Illustration Portfolio</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Noto+Sans+TC:wght@300;500;700;900&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
@@ -11,7 +11,6 @@
         /* ================= 變數設定區 ================= */
         :root {
             --accent: #c5a059;
-            --bg-gradient: linear-gradient(135deg, #ffffff 0%, #fdf9f1 100%);
             --text-dark: #2d2d2d;
             --text-light: #666666;
             --white: #ffffff;
@@ -29,44 +28,23 @@
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g transform="rotate(45 16 16)"><path d="M16 2 C18 2, 20 5, 20 20 L12 20 C12 5, 14 2, 16 2 Z" fill="%23e0e0e0"/><path d="M12 24 C12 28, 15 32, 16 32 C17 32, 20 28, 20 24 Z" fill="%23e0e0e0"/></g></svg>') 5 27, auto !important;
         }
 
-        html { scroll-behavior: smooth; }
-        * { box-sizing: border-box; }
-        
-        body { 
-            margin: 0; background-color: #fdfbf7; 
+        /* 💡 全局設定：背景透明，防止覆蓋負值 z-index 特效 */
+        html, body { 
+            margin: 0; padding: 0; width: 100%;
+            background-color: transparent; 
             font-family: 'Noto Sans TC', sans-serif; 
             color: var(--text-dark); line-height: 1.8; 
-            overflow-x: hidden; user-select: none;
+            overflow-x: hidden; scroll-behavior: smooth;
+            -webkit-user-select: none; user-select: none;
         }
+        * { box-sizing: border-box; }
 
-        /* 💡 提案三：邊緣水墨浸透 (Watercolor Vignette) */
-        .vignette-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none; z-index: -2;
-            background: radial-gradient(circle at center, transparent 40%, rgba(197, 160, 89, 0.08) 120%);
-        }
+        /* ================= 背景圖層 (光暈、金粉、邊緣水墨、和紙) ================= */
+        .vignette-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: -1; background: radial-gradient(circle at center, transparent 40%, rgba(197, 160, 89, 0.08) 120%); }
+        #dust-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none; }
+        .ambient-blobs { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; pointer-events: none; z-index: -3; mix-blend-mode: multiply; }
+        .bg-texture { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #fdfbf7; background-image: radial-gradient(rgba(197, 160, 89, 0.15) 1.5px, transparent 1.5px), linear-gradient(135deg, #ffffff 0%, #fdf9f1 100%); background-size: 25px 25px, 100% 100%; z-index: -4; pointer-events: none; }
 
-        /* 點陣和紙背景層 */
-        .bg-texture {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: transparent;
-            background-image: 
-                radial-gradient(rgba(197, 160, 89, 0.15) 1.5px, transparent 1.5px),
-                linear-gradient(135deg, #ffffff 0%, #fdf9f1 100%);
-            background-size: 25px 25px, 100% 100%;
-            z-index: -4; pointer-events: none;
-        }
-
-        /* 💡 提案二：金箔微粒畫布 (Floating Gold Dust) */
-        #dust-canvas {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -3; pointer-events: none;
-        }
-
-        .container, .hero { position: relative; z-index: 2; }
-
-        /* ================= 1. 四重水彩暈染背景 ================= */
-        .ambient-blobs { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; pointer-events: none; z-index: -4; mix-blend-mode: multiply; }
         .blob-1 { position: absolute; top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(197,160,89,0.25), transparent 60%); filter: blur(60px); animation: float1 18s infinite alternate ease-in-out; }
         .blob-2 { position: absolute; bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(107,140,206,0.2), transparent 60%); filter: blur(60px); animation: float2 22s infinite alternate-reverse ease-in-out; }
         .blob-3 { position: absolute; top: 30%; right: -10%; width: 45vw; height: 45vw; background: radial-gradient(circle, rgba(212,122,126,0.2), transparent 60%); filter: blur(60px); animation: float3 25s infinite alternate ease-in-out; }
@@ -77,50 +55,48 @@
         @keyframes float3 { to { transform: translate(-15vw, -5vh) scale(1.1); } }
         @keyframes float4 { to { transform: translate(15vw, 15vh) scale(0.95); } }
 
-        /* ================= 2. WebP 顏料包容器與樣式 ================= */
+        /* ================= 繪圖與動態容器 ================= */
+        .container, .hero { position: relative; z-index: 2; }
+        
         #splatter-container { position: absolute; top: 0; left: 0; width: 100%; pointer-events: none; z-index: 1; }
         .bg-webp-splatter { position: absolute; pointer-events: auto; transform-origin: center; transform: translate(-50%, -50%) rotate(var(--rot)) scale(1); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s; mix-blend-mode: multiply; opacity: 0.85; }
         .bg-webp-splatter:hover { transform: translate(-50%, -50%) rotate(var(--rot)) scale(1.15); filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2)); z-index: 10; }
 
-        /* ================= 3. 永久作畫的潑墨動畫印記層 ================= */
         #stamp-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; overflow: visible; }
         .anim-stamp { position: absolute; pointer-events: none; mix-blend-mode: multiply; animation: stampPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes stampPop { 0% { transform: translate(-50%, -50%) scale(0.1); opacity: 0; } 40% { opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.85; } }
 
-        /* ================= 🌟 水彩滴落重力特效 ================= */
         .ink-drip { position: absolute; pointer-events: none; z-index: 2; mix-blend-mode: multiply; border-radius: 5px; transform-origin: top center; animation: dripDown ease-out forwards; }
         @keyframes dripDown { 0% { height: 0; opacity: 1; } 50% { opacity: 0.85; } 100% { height: var(--drip-length); opacity: 0.3; } }
 
-        /* ================= 💡 動態墨水量表 UI ================= */
-        .ink-gauge-wrapper { position: fixed; right: 35px; top: 50%; transform: translateY(-50%); width: 14px; height: 200px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); border: 2px solid rgba(197, 160, 89, 0.4); border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1), inset 0 2px 5px rgba(0,0,0,0.1); z-index: 99990; pointer-events: none; overflow: hidden; }
+        /* ================= UI 元件 (墨水系統) ================= */
+        .ink-gauge-wrapper { position: fixed; right: 35px; top: 50%; transform: translateY(-50%); width: 14px; height: 200px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 2px solid rgba(197, 160, 89, 0.4); border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1), inset 0 2px 5px rgba(0,0,0,0.1); z-index: 99990; pointer-events: none; overflow: hidden; }
         .ink-gauge-fill { position: absolute; bottom: 0; left: 0; width: 100%; height: var(--ink-level); background: rgb(var(--current-brush-color)); transition: background-color 0.4s ease, height 0.1s linear; }
         .ink-gauge-alert { position: fixed; right: 65px; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.9); color: var(--accent); padding: 8px 15px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; letter-spacing: 1px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid var(--accent); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         html.out-of-ink .ink-gauge-alert { opacity: 1; animation: pulseAlert 1s infinite alternate; }
         @keyframes pulseAlert { to { transform: translateY(-50%) scale(1.05); } }
 
-        /* ================= 洗筆水幕與按鈕 ================= */
-        .wash-btn { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(12px); border: 1px solid rgba(197, 160, 89, 0.4); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; color: var(--accent); z-index: 99995; pointer-events: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.08), inset 0 0 15px rgba(255,255,255,0.6); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .wash-btn { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(197, 160, 89, 0.4); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; color: var(--accent); z-index: 99995; pointer-events: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.08), inset 0 0 15px rgba(255,255,255,0.6); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .wash-btn:hover { transform: translateY(-8px) scale(1.1); background: var(--accent); color: #fff; box-shadow: 0 15px 35px rgba(197, 160, 89, 0.3); border-color: transparent; }
-        .water-wave { position: fixed; top: -150vh; left: 0; width: 100vw; height: 150vh; background: linear-gradient(to bottom, rgba(253,251,247,0) 0%, rgba(107, 140, 206, 0.15) 50%, rgba(107, 140, 206, 0.4) 100%); backdrop-filter: blur(8px); z-index: 99998; pointer-events: none; border-radius: 0 0 50% 50% / 0 0 150px 150px; will-change: transform; }
+        
+        .water-wave { position: fixed; top: -150vh; left: 0; width: 100vw; height: 150vh; background: linear-gradient(to bottom, rgba(253,251,247,0) 0%, rgba(107, 140, 206, 0.15) 50%, rgba(107, 140, 206, 0.4) 100%); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99998; pointer-events: none; border-radius: 0 0 50% 50% / 0 0 150px 150px; will-change: transform; }
         .water-wave.washing { transition: transform 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95); transform: translate3d(0, 260vh, 0); }
 
-        /* Canvas 畫布群 */
-        #ink-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; pointer-events: auto; background: #fdfbf7; transition: opacity 1.8s ease; }
+        #ink-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; pointer-events: auto; background: transparent; transition: opacity 1.8s ease; }
         #trail-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; pointer-events: none; mix-blend-mode: multiply; }
 
         /* ================= Navbar ================= */
-        .navbar { position: fixed; top: 0; width: 100%; padding: 25px 0; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px); display: flex; justify-content: center; gap: 80px; z-index: 10000; border-bottom: 1px solid rgba(197, 160, 89, 0.15); }
+        .navbar { position: fixed; top: 0; left: 0; width: 100%; padding: 25px 0; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; justify-content: center; gap: 80px; z-index: 10000; border-bottom: 1px solid rgba(197, 160, 89, 0.15); }
         .navbar a { text-decoration: none; color: var(--text-dark); font-weight: 700; font-size: 1.05rem; letter-spacing: 3px; position: relative; transition: var(--transition); }
         .navbar a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -8px; left: 50%; background: var(--accent); transition: var(--transition); transform: translateX(-50%); }
         .navbar a:hover { color: var(--accent); }
         .navbar a:hover::after { width: 100%; }
 
-        /* ================= Hero 首頁：精準還原比例 ================= */
+        /* ================= Hero 首頁：桌機版 100% 原始黃金比例 ================= */
         .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
         .hero-title-group { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px; }
         
-        /* 桌機原始完美大小 */
-        .hero-avatar-box { width: 260px; height: 260px; border-radius: 50%; padding: 8px; background: linear-gradient(135deg, var(--accent), #fdf9f1); box-shadow: 0 15px 35px rgba(0,0,0,0.15); opacity: 0; transform: scale(0.5) rotate(-15deg); }
+        .hero-avatar-box { width: 260px; height: 260px; border-radius: 50%; padding: 8px; background: linear-gradient(135deg, var(--accent), #fdf9f1); box-shadow: 0 15px 35px rgba(0,0,0,0.15); opacity: 0; transform: scale(0.5) rotate(-15deg); flex-shrink: 0; }
         .hero.hero-loaded .hero-avatar-box { animation: avatarPop 1s 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .hero-avatar-box img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 5px solid #fff; object-position: center 20%; }
         @keyframes avatarPop { to { opacity: 1; transform: scale(1) rotate(0deg); } }
@@ -147,15 +123,12 @@
         .section-title { text-align: center; font-size: 2rem; letter-spacing: 10px; text-indent: 10px; margin-bottom: 70px; position: relative; font-weight: 900; color: var(--text-dark); z-index: 2; }
         .section-title::after { content: ""; width: 40px; height: 2px; background: var(--accent); position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); }
 
-        /* ================= 關於我 ================= */
+        /* ================= 關於我 & 技能區塊 ================= */
         #about { overflow: hidden; }
         .parallax-watermark { position: absolute; top: 20%; left: 50%; transform: translate(-50%, 0); font-family: 'Noto Serif TC', serif; font-weight: 900; font-size: 25rem; color: rgba(197, 160, 89, 0.05); pointer-events: none; white-space: nowrap; z-index: 0; line-height: 1; user-select: none; }
         .about-content { position: relative; z-index: 2; }
 
-        /* ================= 3D 懸浮卡片 ================= */
         .tilt-card { position: relative; transform-style: preserve-3d; }
-
-        /* ================= 技能區塊 ================= */
         .skills-wrapper { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; max-width: 900px; margin: 0 auto; }
         .skill-category { flex: 1; min-width: 300px; text-align: center; background: rgba(255, 255, 255, 0.6); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.8); }
         .skill-category h3 { color: var(--accent); letter-spacing: 3px; margin-top: 0; margin-bottom: 25px; font-size: 1.2rem; }
@@ -163,13 +136,12 @@
         .skill-tags span { padding: 8px 20px; background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.06); border-radius: 50px; font-size: 0.9rem; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); transition: var(--transition); }
         .skill-tags span:hover { border-color: var(--accent); transform: translateY(-3px) scale(1.05); color: var(--accent); box-shadow: 0 10px 25px rgba(197, 160, 89, 0.15); }
 
-        /* ================= 左右佈局 ================= */
+        /* ================= 畫廊與調色盤 (桌機原始佈局) ================= */
         .portfolio-layout { display: flex; gap: 80px; align-items: flex-start; }
         .gallery-wrapper { flex: 1; min-width: 0; position: relative; min-height: 600px; }
         #gallery-wipe-canvas { position: absolute; top: -5%; left: -5%; width: 110%; height: 110%; pointer-events: none; z-index: 50; }
         .palette-sidebar { width: 440px; flex-shrink: 0; position: sticky; top: 140px; display: flex; justify-content: flex-end; margin-left: 20px; }
 
-        /* ================= 調色盤 ================= */
         .flat-palette { position: relative; width: 430px; height: 340px; transform: rotate(-6deg); z-index: 10; }
         .palette-board { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #d0ad7f; border-radius: 45% 55% 50% 50% / 50% 50% 55% 45%; -webkit-mask: radial-gradient(circle at calc(100% - 70px) calc(100% - 75px), transparent 30px, black 31px); mask: radial-gradient(circle at calc(100% - 70px) calc(100% - 75px), transparent 30px, black 31px); filter: drop-shadow(10px 15px 20px rgba(0, 0, 0, 0.08)); }
         .thumb-hole-inset { position: absolute; width: 60px; height: 60px; border-radius: 50%; right: 40px; bottom: 45px; box-shadow: inset 4px 6px 10px rgba(0,0,0,0.2), inset -2px -2px 6px rgba(255,255,255,0.3); pointer-events: none; z-index: 5; }
@@ -179,17 +151,15 @@
         .paint-swatch:hover::before { transform: scale(1.35); opacity: 0.2; }
         .paint-swatch.active { transform: rotate(6deg) scale(1.1); box-shadow: 0 0 0 4px #d0ad7f, 0 0 0 6px var(--swatch-color); z-index: 10; }
         .paint-swatch.active::before { display: none; }
-
+        
         .swatch-all { top: 35px; left: 100px; --swatch-color: #3b3a36; --swatch-glow: rgba(59, 58, 54, 0.25); }
         .swatch-sketch { top: 135px; left: 5px; --swatch-color: #9ea1a3; --swatch-glow: rgba(158, 161, 163, 0.3); }
         .swatch-hand { bottom: 20px; left: 100px; --swatch-color: #d47a7e; --swatch-glow: rgba(212, 122, 126, 0.35); }
         .swatch-digital { top: 75px; right: 40px; --swatch-color: #6b8cce; --swatch-glow: rgba(107, 140, 206, 0.35); }
-
         .swatch-content { display: flex; flex-direction: column; align-items: center; pointer-events: none; }
         .swatch-content .jp { font-family: 'Noto Serif TC', serif; font-size: 1.25rem; font-weight: 700; color: #ffffff; letter-spacing: 2px; text-indent: 2px; }
         .swatch-content .en { font-family: 'Noto Sans TC', sans-serif; font-size: 0.75rem; color: rgba(255,255,255,0.85); letter-spacing: 1px; margin-top: 3px; text-transform: uppercase; }
 
-        /* ================= 瀑布流畫廊 ================= */
         .gallery { column-count: 3; column-gap: 20px; width: 100%; }
         .gallery-item { display: inline-block; width: 100%; margin-bottom: 20px; position: relative; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); background: #fff; opacity: 1; transform: translateY(0) scale(1); break-inside: avoid; -webkit-column-break-inside: avoid; }
         .gallery-item img { width: 100%; height: auto; display: block; transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); }
@@ -198,9 +168,9 @@
         .gallery-item.stagger-in { animation: staggerPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; transform: translateY(40px) scale(0.9); }
         @keyframes staggerPop { to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* ================= 🌟 藝術卡片履歷浮雕 (Metadata Overlay) ================= */
         .metadata-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: auto; background: linear-gradient(to top, rgba(20,20,20,0.95) 0%, rgba(20,20,20,0.7) 60%, transparent 100%); color: #fff; padding: 50px 20px 20px; transform: translateY(100%); opacity: 0; transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s ease; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; z-index: 10; }
         .gallery-item:hover .metadata-overlay { transform: translateY(0); opacity: 1; }
+        .gallery-item:hover img { transform: scale(1.05); }
         .meta-title { font-size: 1.1rem; font-weight: 700; letter-spacing: 2px; }
         .meta-info { font-size: 0.75rem; color: #d4d4d4; display: flex; gap: 12px; flex-wrap: wrap; }
         .meta-info span i { color: var(--accent); margin-right: 6px; font-size: 0.8rem; }
@@ -209,72 +179,76 @@
         .view-process-btn:hover { background: #fff; color: var(--text-dark); box-shadow: 0 5px 15px rgba(197, 160, 89, 0.4); }
 
         /* ================= Lightbox 區 ================= */
-        .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20000; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+        .lightbox { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20000; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
         .lightbox.active { opacity: 1; pointer-events: all; }
         .lightbox-close { position: absolute; top: 30px; right: 40px; color: rgba(255, 255, 255, 0.7); font-size: 50px; cursor: pointer; transition: var(--transition); line-height: 1; z-index: 20002; }
         .lightbox-close:hover { color: #fff; transform: rotate(90deg); }
         .lightbox-content-wrapper { position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        #lightbox-img { max-width: 90%; max-height: 85vh; object-fit: contain; border-radius: 8px; transform: scale(0.9) translate(0px, 0px); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); cursor: zoom-in !important; transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s ease; }
+        #lightbox-img { max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: 8px; transform: scale(0.9) translate(0px, 0px); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); cursor: zoom-in !important; transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s ease; }
         .lightbox.active #lightbox-img { transform: scale(1) translate(0px, 0px); }
-        #lightbox-img.zoomed { cursor: grab !important; transition: opacity 0.3s ease; }
+        
+        #lightbox-img.zoomed { cursor: grab !important; transition: opacity 0.3s ease; touch-action: none; }
         #lightbox-img.zoomed:active { cursor: grabbing !important; }
-        .process-timeline { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; background: rgba(25, 25, 25, 0.8); padding: 12px 25px; border-radius: 50px; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); opacity: 0; pointer-events: none; transition: all 0.4s; transform: translate(-50%, 20px); z-index: 20001; }
+        
+        .process-timeline { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; background: rgba(25, 25, 25, 0.8); padding: 12px 25px; border-radius: 50px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); opacity: 0; pointer-events: none; transition: all 0.4s; transform: translate(-50%, 20px); z-index: 20001; }
         .lightbox.show-timeline .process-timeline { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
         .step-btn { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 8px 20px; border-radius: 20px; transition: all 0.3s; font-size: 0.85rem; font-weight: 500; letter-spacing: 1px; }
         .step-btn.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 15px rgba(197, 160, 89, 0.4); }
         .step-btn:hover:not(.active) { background: rgba(255,255,255,0.1); border-color: #fff; }
 
-        /* ================= 📱 響應式佈局 (RWD) 修復版 ================= */
+        /* ================= 📱 響應式佈局 (RWD) ================= */
         @media (max-width: 992px) {
             .gallery { column-count: 2; }
-            /* 修正 Flexbox 折疊 Bug：給予 Wrapper 100% 寬度 */
-            .portfolio-layout { flex-direction: column-reverse; align-items: stretch; gap: 50px; }
+            /* 修正為 column，確保畫廊與調色盤能上下安全顯示 */
+            .portfolio-layout { flex-direction: column-reverse; align-items: center; padding: 0 15px; width: 100%; }
             .gallery-wrapper { width: 100%; flex: none; }
-            .palette-sidebar { width: 100%; height: 320px; display: flex; justify-content: center; position: relative; top: 0; margin: 0; }
+            .palette-sidebar { width: 100%; height: 320px; display: flex; justify-content: center; position: relative; top: 0; margin: 0 0 40px 0; }
             .flat-palette { transform: scale(0.8) rotate(-6deg); transform-origin: center center; }
         }
 
         @media (max-width: 768px) {
-            .navbar { gap: 20px; padding: 15px 10px; flex-wrap: wrap; }
+            .navbar { gap: 15px; padding: 15px 10px; flex-wrap: wrap; }
             .navbar a { font-size: 0.9rem; letter-spacing: 1px; }
             
             .hero-title-group { flex-direction: column; }
-            /* 僅在手機版調整 Hero 元件大小，不影響桌機黃金比例 */
+            /* 僅在手機縮小 Logo，絕不影響桌機 */
             .hero-avatar-box { width: 180px; height: 180px; }
             .hero-signature { width: 90vw; height: auto; }
-            
-            .hero p.subtitle { font-size: 1rem; letter-spacing: 8px; }
+            .hero p.subtitle { font-size: 1.1rem; letter-spacing: 8px; }
             .hero-desc { font-size: 0.9rem; letter-spacing: 2px; }
             
-            .section { padding: 80px 15px; }
-            .parallax-watermark { font-size: 12rem; }
+            .section { padding: 60px 15px; overflow: hidden; }
+            .parallax-watermark { font-size: 10rem; }
             
-            .gallery { column-count: 1; }
-            .palette-sidebar { height: 250px; }
-            .flat-palette { transform: scale(0.65) rotate(-6deg); }
+            /* 💡 手機版強制將畫廊改為一欄直向 Flexbox，絕不消失！ */
+            .gallery { display: flex; flex-direction: column; width: 100%; }
+            .gallery-item { width: 100%; margin-bottom: 25px; border-radius: 12px; }
             
-            /* 手機版調整洗筆按鈕與墨水量表位置 */
+            .palette-sidebar { height: 260px; }
+            .flat-palette { transform: scale(0.6) rotate(-6deg); }
+            
             .ink-gauge-wrapper { right: 10px; height: 150px; width: 10px; }
             .wash-btn { right: 15px; bottom: 15px; width: 50px; height: 50px; font-size: 20px; }
             
-            /* 手機版時光機面板調整 */
-            .process-timeline { width: 90vw; flex-wrap: wrap; justify-content: center; padding: 10px; gap: 8px; bottom: 20px; }
-            .step-btn { padding: 6px 15px; font-size: 0.75rem; }
+            .process-timeline { width: 95vw; flex-wrap: wrap; justify-content: center; padding: 10px; gap: 8px; bottom: 15px; }
+            .step-btn { padding: 6px 12px; font-size: 0.75rem; border-radius: 15px; }
+            .lightbox-close { top: 15px; right: 20px; font-size: 40px; }
             
-            /* 手機版沒有 Hover，讓畫卡資訊常態顯示，輕微調低透明度以免過度遮擋 */
+            /* 讓畫卡資訊在手機常態顯示 */
             .metadata-overlay { 
                 transform: translateY(0); opacity: 1; 
                 padding: 30px 15px 15px;
                 background: linear-gradient(to top, rgba(20,20,20,0.85) 0%, rgba(20,20,20,0.4) 70%, transparent 100%);
             }
         }
+
+        
     </style>
 </head>
 
 <body>
     <div class="vignette-overlay"></div>
     <div class="bg-texture"></div>
-
     <canvas id="dust-canvas"></canvas>
 
     <div class="ambient-blobs">
@@ -285,7 +259,6 @@
     </div>
 
     <div id="splatter-container"></div>
-    
     <div id="stamp-container"></div>
 
     <div class="ink-gauge-wrapper" title="當前墨水量 (Ink Level)">
@@ -415,6 +388,7 @@
                         <div class="gallery-item tilt-card" data-category="sketch" data-title="《素描-Justin Bieber》" data-year="2026" data-tool="鉛筆" data-hours="4"><img src="sketch/s_art2.webp" alt="素描" decoding="async"></div>
                     </div>
                 </div>
+
                 <div class="palette-sidebar">
                     <div class="flat-palette">
                         <div class="palette-board"></div>
@@ -445,6 +419,7 @@
         <div class="lightbox-content-wrapper">
             <img id="lightbox-img" src="" alt="Enlarged Project">
         </div>
+        
         <div class="process-timeline" id="process-timeline">
             <button class="step-btn" data-step="draft">1. 草稿</button>
             <button class="step-btn" data-step="line">2. 線稿</button>
@@ -547,7 +522,7 @@
                 const minGap = 50; 
 
                 for(let i=0; i<totalSplatters; i++) {
-                    // 💡 嚴格固定大小：250px ~ 350px
+                    // 💡 嚴格固定大小：150px ~ 250px
                     const size = Math.random() * 250 + 350; 
                     let x, y, cx, cy; let valid = false; let attempts = 0;
 
@@ -592,7 +567,7 @@
         }
         window.addEventListener('load', spawnWebpSplatters);
 
-        // ================= 🎨 畫布作畫動畫印記 ＋ 🌟 極致水彩重力滴落 =================
+        // ================= 🎨 畫布作畫動畫印記 ＋ 🌟 水彩重力滴落 =================
         const stampContainer = document.getElementById('stamp-container');
 
         function drawPermanentStamp(pageX, pageY, rgb) {
@@ -772,11 +747,10 @@
             setTimeout(animate, 200);
         });
 
-        // ================= 3. 枯筆分岔與飛濺的細膩拖尾特效 (結合消耗機制與手機觸控支援) =================
+        // ================= 3. 枯筆分岔與飛濺的細膩拖尾特效 =================
         const trailCanvas = document.getElementById('trail-canvas');
         const tCtx = trailCanvas.getContext('2d');
-        let points = [];
-        let lastMousePos = { x: null, y: null };
+        let points = []; let lastMousePos = { x: null, y: null };
         
         function resizeTrail() { trailCanvas.width = window.innerWidth; trailCanvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeTrail); resizeTrail();
@@ -884,16 +858,13 @@
                     wCtx.clearRect(0, 0, wipeCanvas.width, wipeCanvas.height);
 
                     if (phase === 'splashIn') {
-                        splashRadius += 25; 
-                        wCtx.globalCompositeOperation = 'source-over'; wCtx.fillStyle = `rgb(${rgb})`;
-                        wCtx.beginPath();
+                        splashRadius += 25; wCtx.globalCompositeOperation = 'source-over'; wCtx.fillStyle = `rgb(${rgb})`; wCtx.beginPath();
                         for (let i = 0; i <= Math.PI * 2; i += 0.1) {
                             let noise = Math.sin(i * 10 + splashRadius*0.1) * 30; let r = splashRadius + noise;
                             let x = wipeCanvas.width/2 + Math.cos(i) * r; let y = wipeCanvas.height/2 + Math.sin(i) * r;
                             if (i === 0) wCtx.moveTo(x, y); else wCtx.lineTo(x, y);
                         }
                         wCtx.fill();
-
                         if (splashRadius >= maxRadius) { phase = 'swap'; }
                         wipeAnimId = requestAnimationFrame(animateWipe);
 
@@ -911,21 +882,16 @@
                         setTimeout(() => { phase = 'splashOut'; splashRadius = 0; wipeAnimId = requestAnimationFrame(animateWipe); }, 50);
 
                     } else if (phase === 'splashOut') {
-                        splashRadius += 30; 
-                        wCtx.globalCompositeOperation = 'source-over'; wCtx.fillStyle = `rgb(${rgb})`; wCtx.fillRect(0, 0, wipeCanvas.width, wipeCanvas.height);
-                        wCtx.globalCompositeOperation = 'destination-out';
-                        wCtx.beginPath();
+                        splashRadius += 30; wCtx.globalCompositeOperation = 'source-over'; wCtx.fillStyle = `rgb(${rgb})`; wCtx.fillRect(0, 0, wipeCanvas.width, wipeCanvas.height);
+                        wCtx.globalCompositeOperation = 'destination-out'; wCtx.beginPath();
                         for (let i = 0; i <= Math.PI * 2; i += 0.1) {
                             let noise = Math.sin(i * 8 - splashRadius*0.1) * 40; let r = splashRadius + noise;
                             let x = wipeCanvas.width/2 + Math.cos(i) * r; let y = wipeCanvas.height/2 + Math.sin(i) * r;
                             if (i === 0) wCtx.moveTo(x, y); else wCtx.lineTo(x, y);
                         }
                         wCtx.fill();
-
                         if (splashRadius >= maxRadius + 50) {
-                            wCtx.clearRect(0, 0, wipeCanvas.width, wipeCanvas.height);
-                            cancelAnimationFrame(wipeAnimId);
-                            setTimeout(() => { isFiltering = false; }, 500); 
+                            wCtx.clearRect(0, 0, wipeCanvas.width, wipeCanvas.height); cancelAnimationFrame(wipeAnimId); setTimeout(() => { isFiltering = false; }, 500); 
                         } else { wipeAnimId = requestAnimationFrame(animateWipe); }
                     }
                 }
@@ -1012,7 +978,6 @@
                     const ctx = canvas.getContext('2d', { willReadFrequently: true });
                     const rect = el.getBoundingClientRect();
                     
-                    // 兼容手機版觸控座標
                     const clickX = e.clientX || (e.touches && e.touches[0].clientX);
                     const clickY = e.clientY || (e.touches && e.touches[0].clientY);
                     
@@ -1084,7 +1049,7 @@
             }
         });
 
-        // ================= 💡 X光放大鏡引擎 (防手震平移 ＆ 📱 手機拖曳支援) =================
+        // ================= 💡 X光放大鏡引擎 (防手震平移 ＆ 📱 手機無干擾拖曳支援) =================
         lightboxImg.addEventListener('click', (e) => {
             e.stopPropagation(); 
             
@@ -1094,11 +1059,13 @@
             }
 
             if (zoomScale === 1) {
-                zoomScale = 2.5; 
+                // 💡 判斷如果是手機，縮放倍率調降為 1.8 倍，避免超出螢幕太多
+                const isMobile = window.innerWidth <= 768;
+                zoomScale = isMobile ? 1.8 : 2.5; 
+                
                 lightboxImg.classList.add('zoomed');
                 const rect = lightboxImg.getBoundingClientRect();
                 
-                // 兼容手機與桌機點擊座標
                 const clickX = e.clientX || (e.touches && e.touches[0].clientX);
                 const clickY = e.clientY || (e.touches && e.touches[0].clientY);
 
@@ -1130,13 +1097,14 @@
         });
         window.addEventListener('mouseup', () => { isPanning = false; setTimeout(() => { hasDragged = false; }, 100); });
         
-        // 💡 手機版拖曳 (Touch Events for Lightbox)
+        // 💡 手機版觸控拖曳 (Touch Events)
         lightboxImg.addEventListener('touchstart', (e) => {
             if (zoomScale > 1 && e.touches.length > 0) {
                 isPanning = true; hasDragged = false; 
                 startX = e.touches[0].clientX - pointX; startY = e.touches[0].clientY - pointY;
             }
         }, { passive: true });
+        
         window.addEventListener('touchmove', (e) => {
             if (!isPanning || e.touches.length === 0) return;
             // 放大時阻擋畫面滾動
@@ -1148,6 +1116,7 @@
             pointX = tX - startX; pointY = tY - startY;
             lightboxImg.style.transform = `scale(${zoomScale}) translate(${pointX/zoomScale}px, ${pointY/zoomScale}px)`;
         }, { passive: false });
+        
         window.addEventListener('touchend', () => { isPanning = false; setTimeout(() => { hasDragged = false; }, 100); });
 
         // ================= 滾動邏輯 =================
